@@ -1,2 +1,2 @@
-# UofG-Real-Time-Human-Traffic-Flow-monitor
-UofG Real Time Human Traffic Flow monitor
+# UofG-real-time-crowd-movement-monitoring-system
+UofG Real Time Crowd MovementFlow Monitoring System
