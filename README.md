@@ -1,2 +1,2 @@
 # UofG-real-time-crowd-movement-monitoring-system
-UofG Real Time Crowd MovementFlow Monitoring System
+A Real Time Crowd Movement Flow Monitoring System created using C++ on Raspberry Pi.
