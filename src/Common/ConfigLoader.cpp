@@ -11,11 +11,16 @@
 
 ConfigLoader::ConfigLoader()
 {
-    load("config.yaml");
+#ifdef CONFIG_PATH
+    ConfigLoader config(CONFIG_PATH);
+#else
+    ConfigLoader config("config.yaml");
+#endif
 }
 
 ConfigLoader::ConfigLoader(const std::string& filename)
 {
+
     load(filename);
 }
 
