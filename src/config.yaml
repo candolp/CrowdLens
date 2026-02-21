@@ -1,5 +1,5 @@
 #Infrared config
-infrared_pin:
+infrared_input:
   pin_number: 18
   direction: in
   type: DIGITAL
