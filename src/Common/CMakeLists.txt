@@ -4,6 +4,7 @@ add_library(Common
      ConfigLoader.cpp
     CppTimer.h
     CppTimerCallbackInterface.h
+    Runnable.h
 )
 # Make headers available to targets that link against Common
 target_include_directories(Common PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
