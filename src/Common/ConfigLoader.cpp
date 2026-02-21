@@ -4,8 +4,10 @@
 
 #include "ConfigLoader.h"
 #include <fstream>
+#include <iostream>
 #include <sstream>
 #include <vector>
+#include <filesystem>
 
 ConfigLoader::ConfigLoader()
 {
@@ -26,7 +28,11 @@ std::string ConfigLoader::trim(const std::string& s) {
 
 bool ConfigLoader::load(const std::string& filename) {
     std::ifstream file(filename);
-    if (!file.is_open()) return false;
+    if (!file.is_open())
+    {
+        std::cout << "file not found: " << filename << std::endl;
+        return false;
+    }
 
     std::string line;
     std::vector<std::pair<int, std::string>> stack; // Stores {indent_level, key_name}

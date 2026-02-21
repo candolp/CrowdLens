@@ -9,5 +9,5 @@ target_link_libraries(ConfigLoaderTest  Common)
 add_test(NAME TestCommonConfigLoader COMMAND ConfigLoaderTest)
 
 target_compile_definitions(ConfigLoaderTest PRIVATE
-        CONFIG_PATH="${CMAKE_SOURCE_DIR}/config.yaml")
+        CONFIG_PATH="${CMAKE_SOURCE_DIR}/src/config.yaml")
 
