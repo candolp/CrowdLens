@@ -15,7 +15,7 @@ target_compile_definitions(ConfigLoaderTest PRIVATE
 
 add_executable (test_twotimers twotimers.cpp)
 TARGET_LINK_LIBRARIES(test_twotimers Common)
-add_test(TestTwotimers_ms test_twotimers_ms)
+add_test(TestTwotimers test_twotimers)
 
 
 add_executable (test_startstop startstop.cpp)
