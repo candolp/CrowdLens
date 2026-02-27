@@ -8,6 +8,8 @@
 
 
 int main() {
-    std::cout << "Hello, World!" << std::endl;
+    std::cout << "CrowdLense is Running ..." << std::endl;
+    printf("Press enter\n");
+    getchar();
     return 0;
 }
