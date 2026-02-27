@@ -5,7 +5,6 @@
 #ifndef CROWDLENS_IRSENSOR_H
 #define CROWDLENS_IRSENSOR_H
 #include "../Common/ConfigLoader.h"
-#include "../Common/CppTimer.h"
 #include "../Common/TrafficEventHandler.h"
 
 
