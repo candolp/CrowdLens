@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.6)
+cmake_minimum_required(VERSION 3.16)
 project(CrowdLens VERSION 0.0.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -22,6 +22,9 @@ add_subdirectory(${CMAKE_SOURCE_DIR}/src/IRSensor)
 
 #add subdirectory containing sending notification to stakeholders
 add_subdirectory(${CMAKE_SOURCE_DIR}/src/Notification)
+
+#add subdirectory containing common codes
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/Common)
 
 ##compile options to check the code
 add_compile_options(-Wall -Wconversion -Wextra -pedantic)
