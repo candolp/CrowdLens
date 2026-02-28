@@ -1,27 +1,39 @@
-cmake_minimum_required(VERSION 3.6)
+cmake_minimum_required(VERSION 3.14)
 project(CrowdLens VERSION 0.0.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-enable_testing()
+find_package(OpenCV REQUIRED)
+find_package(Threads REQUIRED)
 
-#add subdirectory containing demo code
-add_subdirectory(${CMAKE_SOURCE_DIR}/src/demo)
+include_directories(${CMAKE_SOURCE_DIR}/include)
 
-#add subdirectory containing AI code for crowd detection
+include(FetchContent)
+FetchContent_Declare(
+        googletest
+        URL https://github.com/google/googletest/archive/refs/heads/main.zip
+)
+FetchContent_MakeAvailable(googletest)
+
+add_compile_options(-Wall -Wconversion -Wextra -pedantic)
+
+# Layer subdirectories (existing code)
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/capture)
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/processing)
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/analysis)
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/display)
+
+# Team subdirectories (to be populated)
 add_subdirectory(${CMAKE_SOURCE_DIR}/src/AIDetection)
-
-#add subdirectory containing codes for capturing video from camera
 add_subdirectory(${CMAKE_SOURCE_DIR}/src/CameraCapture)
-
-#add subdirectory containing code for hardware output: speaker and led
 add_subdirectory(${CMAKE_SOURCE_DIR}/src/HardwareOutput)
-
-#add subdirectory containing code for Infer-red sensor
 add_subdirectory(${CMAKE_SOURCE_DIR}/src/IRSensor)
-
-#add subdirectory containing sending notification to stakeholders
 add_subdirectory(${CMAKE_SOURCE_DIR}/src/Notification)
 
-##compile options to check the code
-add_compile_options(-Wall -Wconversion -Wextra -pedantic)
+# Entry point
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/demo)
+
+# Tests
+enable_testing()
+add_subdirectory(${CMAKE_SOURCE_DIR}/tests)
