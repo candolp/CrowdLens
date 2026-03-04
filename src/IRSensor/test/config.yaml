@@ -4,8 +4,8 @@ infrared_input:
   chip_number: 0  # the chip number of the sensor
   type: DIGITAL ##########################DIGITAL or ANALOG # Choose between DIGITAL or ANALOG sensor
   open_threshold_value: 1 #the value of the sensor, below which traffic is detected. 1 for digital sensor, <Ir sensor datasheet> for analog sensor
-  read_interval: 100   # the time between sensor reading in milliseconds
-  max_blocked_time: 10000  #The time in which the sensor is blocked to trigger traffic flow detection in milliseconds
+  read_interval: 10   # the time between sensor reading in milliseconds
+  max_blocked_time: 20  #The time in which the sensor is blocked to trigger traffic flow detection in milliseconds
 
 #hardware output config
 Hardware_output:
