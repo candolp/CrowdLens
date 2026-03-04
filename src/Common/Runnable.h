@@ -14,7 +14,7 @@ class Runnable
 public:
     virtual ~Runnable() = default;
     virtual void run(TrafficState traffic_state) = 0;
-    virtual void stop(TrafficState traffic_state);
+    virtual void stop(TrafficState traffic_state) =0;
 };
 
 

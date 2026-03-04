@@ -18,6 +18,20 @@ public:
 	eventHandlers.push_back(&h);
     }
 
+	/**
+	 * Stops the traffic event handler and notifies all registered event handlers.
+	 * Terminates the worker thread and propagates the stop signal to all subscribers.
+	 * @param traffic_state The final traffic state to be passed to all event handlers during shutdown
+	 */
+	void stop(TrafficState traffic_state) override {
+		runState = RunState::STOPPED;
+		for(auto & r : eventHandlers)
+		{
+			r->stop(traffic_state);
+		}
+		if (workerThread.joinable()) workerThread.join();
+	}
+
 
 protected:
 	// the traffic_state
@@ -28,11 +42,24 @@ protected:
      * Iterates through all registered event handlers and invokes their run() method
 	 * with the current traffic state, effectively broadcasting state changes to all subscribers
 	**/
-	virtual void worker() override {
-	for(auto & r : eventHandlers) {
-	    r->run(traffic_state);
+	virtual void worker()=0;
+	/**
+	 * Notifies all registered event handlers of a traffic state change.
+	 * Broadcasts the traffic state update to all subscribers by invoking their run() method.
+	 * @param trafficState The current traffic state to be propagated to all event handlers
+	 */
+	virtual void eventCallback(TrafficState trafficState) {
+		for(auto & r : eventHandlers) {
+			r->run(trafficState);
+		}
 	}
-    }
+	void run(TrafficState state) override
+	{
+		traffic_state = state;
+		runState = RunState::RUNNING;
+		// Starting thread
+		workerThread = std::thread(&TrafficEventHandler::worker, this);
+	}
 
 	std::thread workerThread;
 
@@ -40,6 +67,8 @@ protected:
 
     // vector of all the subscribers
     std::vector<Runnable*> eventHandlers;
+
+
 };
 
 

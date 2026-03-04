@@ -25,4 +25,11 @@ enum RunState
     STOPPING
 };
 
+enum HardwareState
+{
+    INIT,
+    READY,
+    ERROR
+};
+
 #endif //CROWDLENS_CROWLENSESTATE_H
