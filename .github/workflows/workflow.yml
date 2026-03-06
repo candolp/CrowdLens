@@ -16,7 +16,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake build-essential
+          sudo apt-get install -y cmake build-essential libopencv-dev libcamera-dev libgpiod-dev 
 
       - name: Configure CMake
         run: cmake -B build -S .
