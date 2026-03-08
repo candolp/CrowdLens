@@ -19,14 +19,11 @@ Hardware_output:
     direction: out
     volume: 50
   LED:
-    warning:
-      available: true
-      pin_number: 25
-      direction: out
-    traffic:
-      available: true
-      pin_number: 26
-      direction: out
+    chip_number: 0  # the chip number of the sensor
+    available: true
+    pin_number: 27
+    direction: out
+
 
 #email notification config
 Notifications:
