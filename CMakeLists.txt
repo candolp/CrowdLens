@@ -28,3 +28,4 @@ add_subdirectory(${CMAKE_SOURCE_DIR}/src/demo)
 
 ##compile options to check the code
 add_compile_options(-Wall -Wconversion -Wextra -pedantic)
+
