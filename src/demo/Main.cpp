@@ -20,6 +20,7 @@ int main() {
     LEDOutput ledOutput  = LEDOutput(17, 0);
     ledOutput.run(TrafficState::TRAFFIC);
     std::this_thread::sleep_for(std::chrono::milliseconds(60000));
+    ledOutput.stop(TrafficState::NO_TRAFFIC);
     printf("Press enter\n");
     getchar();
     return 0;
