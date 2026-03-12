@@ -24,12 +24,12 @@ std::vector<CrowdMetrics> OpenCVFrameProcessor::processFrame(
     if (!prevGrey_.empty())
     {
         cv::calcOpticalFlowFarneback(prevGrey_, grey, flow,
-            0.5, //pyramid scale
+            0.5, // pyramid scale
             3, // pyramid levels
             15, // window size
-            3, //iterations
+            3, // iterations
             5, // poly_n
-            1.2, //poly_sigma
+            1.2, // poly_sigma
             0 // flags
         );
     }
