@@ -7,10 +7,12 @@ find_package(CURL REQUIRED)
 # and the test executable can link against it without recompiling
 add_library(Notification_lib STATIC
     EmailNotification.cpp
+    config/ConfigLoader.cpp
 )
 
 target_include_directories(Notification_lib PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/config
     ${CURL_INCLUDE_DIRS}
 )
 
