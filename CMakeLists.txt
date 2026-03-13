@@ -33,6 +33,9 @@ add_subdirectory(${CMAKE_SOURCE_DIR}/src/IRSensor)
 #add subdirectory containing sending notification to stakeholders
 add_subdirectory(${CMAKE_SOURCE_DIR}/src/Notification)
 
+#add subdirectory containing visual overlay / display window
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/Display)
+
 #add subdirectory containing common codes
 add_subdirectory(${CMAKE_SOURCE_DIR}/src/Common)
 
