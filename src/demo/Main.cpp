@@ -11,6 +11,7 @@
 #include "../AIDetection/ZoneManager.h"
 #include "../Common/CrowdLensState.h"
 #include "../Notification/ConsoleEventHandler.h"
+#include "../Display/FrameOverlay.h"
 #include <iostream>
 #include <memory>
 #include <sstream>
@@ -71,6 +72,15 @@ int main(int argc, char* argv[]) {
     cl::ConsoleEventHandler console;
     analyser.registerAlertRunnable(console);
 
+    cl::FrameOverlay overlay("CrowdLens");
+    analyser.registerAlertRunnable(overlay);
+
+    analyser.setDisplayCallback(
+        [&overlay](cv::Mat frame, std::vector<cl::CrowdMetrics> metrics, std::vector<cl::Zone> zones) {
+            overlay.pushFrame(std::move(frame), std::move(metrics), std::move(zones));
+        }
+    );
+
     // pick frame source based on config
     std::unique_ptr<cl::IFrameSource> source;
     if (cameraIndex == -1)
@@ -82,14 +92,17 @@ int main(int argc, char* argv[]) {
         analyser.onFrameArrived(std::move(frame), ts);
     });
 
+    overlay.start();
     analyser.run(TrafficState::NO_TRAFFIC);
     source->start();
 
     std::cout << "CrowdLens running. Press 'q' in the window to stop.\n";
     while (overlay.tick()) {}
 
+    // shutdown in reverse dependency order: capture -> analyser -> overlay
     source->stop();
     analyser.stop(TrafficState::NO_TRAFFIC);
+    overlay.stop();
     return 0;
 }
 
