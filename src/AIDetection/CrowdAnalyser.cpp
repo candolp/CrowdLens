@@ -26,6 +26,10 @@ CrowdAnalyser::~CrowdAnalyser() {
 }
 
 
+void CrowdAnalyser::setDisplayCallback(DisplayCallback callback) {
+    displayCallback_ = std::move(callback);
+}
+
 void CrowdAnalyser::onFrameArrived(cv::Mat frame, std::chrono::steady_clock::time_point ts) {
     {
         std::lock_guard<std::mutex> lock(frameMutex_);
@@ -99,6 +103,10 @@ void CrowdAnalyser::worker() {
                 eventCallback(TrafficState::STAMPEDE);
             }
         }
+
+        // send the frame + metrics + zones to the display thread if one is registered
+        if (displayCallback_)
+            displayCallback_(frame, metrics, zones);
     }
 }
 

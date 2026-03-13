@@ -41,6 +41,8 @@ configure_file(${CMAKE_SOURCE_DIR}/src/config.yaml ${CMAKE_BINARY_DIR}/config.ya
 
 # Define CONFIG_PATH for all targets
 add_compile_definitions(CONFIG_PATH="${CMAKE_BINARY_DIR}/config.yaml")
+#add subdirectory containing visual overlay / display window
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/Display)
 
 ##compile options to check the code
 add_compile_options(-Wall -Wconversion -Wextra -pedantic)

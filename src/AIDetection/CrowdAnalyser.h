@@ -20,6 +20,9 @@
 
 namespace cl {
 
+// fired each analysis cycle so the display can get the latest frame + metrics
+using DisplayCallback = std::function<void(cv::Mat, std::vector<CrowdMetrics>, std::vector<Zone>)>;
+
 // gets frames, runs analysis, fires alerts to registered subscribers
 class CrowdAnalyser : public TrafficEventHandler {
 public:
@@ -29,6 +32,8 @@ public:
     ~CrowdAnalyser();
 
     void loadConfig(const ConfigLoader& config);
+
+    void setDisplayCallback(DisplayCallback callback);
 
     // camera thread calls this, drop the old frame and wake the analysis thread
     void onFrameArrived(cv::Mat frame, std::chrono::steady_clock::time_point ts);
@@ -54,6 +59,7 @@ private:
 
     std::unique_ptr<IFrameProcessor> processor_;
     ZoneManager& zoneManager_;
+    DisplayCallback displayCallback_;
 
     using FrameEntry = std::pair<cv::Mat, std::chrono::steady_clock::time_point>;
     std::optional<FrameEntry> pendingFrame_;

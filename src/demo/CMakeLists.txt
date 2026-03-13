@@ -15,6 +15,7 @@ target_link_libraries(CrowdLens
         AIDetection
         CameraCapture
         Notification
+        Display
         )
 
 #target_compile_definitions(Common PRIVATE
