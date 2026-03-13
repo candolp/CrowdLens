@@ -42,6 +42,10 @@ void CrowdAnalyser::setChokepointThreshold(float threshold) {
     chokepointThreshold_ = threshold;
 }
 
+void CrowdAnalyser::setFlowMagnitudeThreshold(float threshold) {
+    if (threshold < 0.0f) return;
+    flowMagnitudeThreshold_ = threshold;
+}
 
 void CrowdAnalyser::worker() {
     while (running_.load()) {
