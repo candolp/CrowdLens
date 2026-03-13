@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Common/AlertEvent.h"
+#include "../Common/ConfigLoader.h"
 #include "../Common/AlertRunnable.h"
 #include "IFrameProcessor.h"
 #include "ZoneManager.h"
@@ -24,7 +25,10 @@ class CrowdAnalyser : public TrafficEventHandler {
 public:
     // processor does the actual OpenCV work, manager holds the zones
     CrowdAnalyser(std::unique_ptr<IFrameProcessor> processor, ZoneManager& manager);
+    CrowdAnalyser(std::unique_ptr<IFrameProcessor> processor, ZoneManager& manager, const ConfigLoader& config);
     ~CrowdAnalyser();
+
+    void loadConfig(const ConfigLoader& config);
 
     // camera thread calls this, drop the old frame and wake the analysis thread
     void onFrameArrived(cv::Mat frame, std::chrono::steady_clock::time_point ts);

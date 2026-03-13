@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Zone.h"
+#include "../Common/ConfigLoader.h"
 
 #include <map>
 #include <mutex>
@@ -13,6 +14,9 @@ namespace cl {
 class ZoneManager {
 public:
     ZoneManager() = default;
+    ZoneManager(const ConfigLoader& config);
+
+    void loadConfig(const ConfigLoader& config);
 
     void addZone(Zone zone);
 

@@ -1,6 +1,43 @@
 #include "ZoneManager.h"
+#include "../Common/ConfigLoader.h"
+#include <sstream>
 
 namespace cl {
+
+static ZoneType zoneTypeFromString(const std::string& s) {
+    if (s == "ENTRANCE") return ZoneType::ENTRANCE;
+    if (s == "EXIT") return ZoneType::EXIT;
+    if (s == "CHOKEPOINT") return ZoneType::CHOKEPOINT;
+    return ZoneType::GENERAL;
+}
+
+ZoneManager::ZoneManager(const ConfigLoader& config) {
+    loadConfig(config);
+}
+
+void ZoneManager::loadConfig(const ConfigLoader& config) {
+    std::string namesStr = config.getValue("zones:names", "");
+    std::istringstream namesStream(namesStr);
+    std::string zoneName;
+    while (std::getline(namesStream, zoneName, ',')) {
+        size_t start = zoneName.find_first_not_of(" \t");
+        size_t end = zoneName.find_last_not_of(" \t");
+        if (start == std::string::npos) continue;
+        zoneName = zoneName.substr(start, end - start + 1);
+
+        std::string type = config.getValue("zones:zone." + zoneName + ":type", "GENERAL");
+        std::string pointsStr = config.getValue("zones:zone." + zoneName + ":points", "");
+        std::istringstream pointsStream(pointsStr);
+        std::string token;
+        std::vector<cv::Point> poly;
+        while (pointsStream >> token) {
+            size_t comma = token.find(',');
+            if (comma != std::string::npos)
+                poly.emplace_back(std::stoi(token.substr(0, comma)), std::stoi(token.substr(comma + 1)));
+        }
+        addZone(Zone(zoneName, poly, zoneTypeFromString(type)));
+    }
+}
 
 void ZoneManager::addZone(Zone zone) {
     std::lock_guard<std::mutex> lock(mutex_);

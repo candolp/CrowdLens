@@ -1,4 +1,5 @@
 #include "CrowdAnalyser.h"
+#include "../Common/ConfigLoader.h"
 
 namespace cl {
 
@@ -6,6 +7,18 @@ CrowdAnalyser::CrowdAnalyser(std::unique_ptr<IFrameProcessor> processor, ZoneMan
     : zoneManager_(manager)
 {
     processor_ = std::move(processor);
+}
+
+CrowdAnalyser::CrowdAnalyser(std::unique_ptr<IFrameProcessor> processor, ZoneManager& manager, const ConfigLoader& config)
+    : CrowdAnalyser(std::move(processor), manager)
+{
+    loadConfig(config);
+}
+
+void CrowdAnalyser::loadConfig(const ConfigLoader& config) {
+    setDensityThreshold(std::stof(config.getValue("thresholds:density", "0.7")));
+    setChokepointThreshold(std::stof(config.getValue("thresholds:chokepoint", "0.85")));
+    setFlowMagnitudeThreshold(std::stof(config.getValue("thresholds:flow_magnitude", "2.0")));
 }
 
 CrowdAnalyser::~CrowdAnalyser() {
