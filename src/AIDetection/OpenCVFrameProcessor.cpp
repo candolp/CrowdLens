@@ -8,6 +8,36 @@ OpenCVFrameProcessor::OpenCVFrameProcessor() {
     bgSubtractor_ = cv::createBackgroundSubtractorMOG2();
 }
 
+void OpenCVFrameProcessor::setPixelsPerPerson(int pixels) {
+    if (pixels <= 0) return;
+    pixelsPerPerson_ = pixels;
+}
+
+void OpenCVFrameProcessor::setPyrScale(double scale) {
+    if (scale <= 0.0 || scale >= 1.0) return;
+    pyrScale_ = scale;
+}
+void OpenCVFrameProcessor::setLevels(int levels) {
+    if (levels <= 0) return;
+    levels_ = levels;
+}
+void OpenCVFrameProcessor::setWinSize(int winSize) {
+    if (winSize <= 0) return;
+    winSize_ = winSize;
+}
+void OpenCVFrameProcessor::setIterations(int iterations) {
+    if (iterations <= 0) return;
+    iterations_ = iterations;
+}
+void OpenCVFrameProcessor::setPolyN(int polyN) {
+    if (polyN <= 0) return;
+    polyN_ = polyN;
+}
+void OpenCVFrameProcessor::setPolySigma(double sigma) {
+    if (sigma <= 0.0) return;
+    polySigma_ = sigma;
+}
+
 std::vector<CrowdMetrics> OpenCVFrameProcessor::processFrame(
     const cv::Mat& frame,
     const std::vector<Zone>& zones,
@@ -24,12 +54,12 @@ std::vector<CrowdMetrics> OpenCVFrameProcessor::processFrame(
     if (!prevGrey_.empty())
     {
         cv::calcOpticalFlowFarneback(prevGrey_, grey, flow,
-            0.5, // pyramid scale
-            3, // pyramid levels
-            15, // window size
-            3, // iterations
-            5, // poly_n
-            1.2, // poly_sigma
+            pyrScale_, // pyramid scale
+            levels_, // pyramid levels
+            winSize_, // window size
+            iterations_, // iterations
+            polyN_,
+            polySigma_,
             0 // flags
         );
     }
@@ -67,7 +97,7 @@ std::vector<CrowdMetrics> OpenCVFrameProcessor::processFrame(
         CrowdMetrics m;
         m.zoneName = zone.name();
         m.density = density;
-        m.count = fgPixels / 500; // assuming each person occupies ~500 pixels
+        m.count = fgPixels / pixelsPerPerson_; // assuming each person occupies ~pixelsPerPerson_ pixels
         m.flowAngle = flowAngle;
         m.flowMagnitude = flowMagnitude;
         m.timestamp = ts;
