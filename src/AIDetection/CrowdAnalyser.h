@@ -45,6 +45,9 @@ public:
     // fires a chokepoint alert if occupancy is high and flow is low
     void setChokepointThreshold(float threshold);
 
+    // low-flow cutoff used alongside chokepointThreshold to detect chokepoints
+    void setFlowMagnitudeThreshold(float threshold);
+
 private:
     // waits for frames and processes them; implements TrafficEventHandler::worker()
     void worker() override;
