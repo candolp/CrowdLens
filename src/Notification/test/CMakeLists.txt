@@ -15,5 +15,8 @@ gtest_discover_tests(Notification_test)
 # Register with CTest so `ctest` or `cmake --build . --target test` works
 add_test(NAME EmailNotifierTests COMMAND test_email)
 
-# send test
-target_compile_definitions(test_email PRIVATE LIVE_TEST)
+# Live email test is opt-in only — pass -DLIVE_TEST=ON to cmake to enable.
+# Example: cmake .. -DLIVE_TEST=ON
+if(LIVE_TEST)
+    target_compile_definitions(test_email PRIVATE LIVE_TEST)
+endif()
