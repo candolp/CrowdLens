@@ -26,6 +26,12 @@ add_subdirectory(${CMAKE_SOURCE_DIR}/src/Notification)
 #add subdirectory containing demo code
 add_subdirectory(${CMAKE_SOURCE_DIR}/src/demo)
 
+#add config file
+configure_file(${CMAKE_SOURCE_DIR}/src/config.yaml ${CMAKE_BINARY_DIR}/config.yaml COPYONLY)
+
+# Define CONFIG_PATH for all targets
+add_compile_definitions(CONFIG_PATH="${CMAKE_BINARY_DIR}/config.yaml")
+
 ##compile options to check the code
 add_compile_options(-Wall -Wconversion -Wextra -pedantic)
 

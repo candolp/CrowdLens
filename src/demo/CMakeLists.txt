@@ -10,7 +10,8 @@ target_link_libraries(CrowdLens
         Common
         LEDOutput
         pthread
+        IRSensor
         gpiodcxx)
 
-target_compile_definitions(Common PRIVATE
-        CONFIG_PATH="${CMAKE_SOURCE_DIR}/src/config.yaml")
+#target_compile_definitions(Common PRIVATE
+#        CONFIG_PATH="${CMAKE_SOURCE_DIR}/src/config.yaml")

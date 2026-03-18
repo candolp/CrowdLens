@@ -6,8 +6,10 @@
 #include <chrono>
 #include <thread>
 #include <iostream>
-#include <gpiod.hpp>
+#include <string>
 #include <format>
+#include <gpiod.hpp>
+
 
 IRSensor::IRSensor() : config(*(ConfigLoader*)nullptr)
 {
@@ -32,13 +34,13 @@ IRSensor::IRSensor(const ConfigLoader& config, bool skipInit) : config(config)
 void IRSensor::loadConfig(const ConfigLoader& config)
 {
     // Load configuration values
-    GPIOPin = std::stoi(config.getValue("infrared_input:pin_number", "17"));
+    GPIOPin = std::stoi(config.getValue("infrared_input:pin_number", "22"));
     CHIPNo = std::stoi(config.getValue("infrared_input:chip_number", "0"));
     readInterval = std::stoi(config.getValue("infrared_input:read_interval", "500"));
     maxBlockTime = std::stoi(config.getValue("infrared_input:max_blocked_time", "10000"));
     openThresholdValue = std::stoi(config.getValue("infrared_input:open_threshold_value", "1"));
-    std::cout << "Running rubbish constructor !!!!!!!!!!!!!!!!!!!" << std::endl;
     std::string sensorTypeStr = config.getValue("infrared_input:type", "DIGITAL");
+    std::cout << "Running rubbish constructor !!!!!!!!!!!!!!!!!!!" << std::endl;
     if (sensorTypeStr == "ANALOG")
     {
         sensorType = IRSensorType::ANALOG;
@@ -54,6 +56,9 @@ void IRSensor::initSensor()
     // Initialize GPIO chip and line request
     const std::string chipPath = std::format("/dev/gpiochip{}", CHIPNo);
     const std::string consumername = std::format("gpioconsumer_{}_{}", CHIPNo, GPIOPin);
+    // const std::string chipPath = "/dev/gpiochip" + std::to_string(CHIPNo);
+    // const std::string consumername = "gpioconsumer_"+ std::to_string(CHIPNo) + "_" + std::to_string(GPIOPin);
+    std::cout << "chip path: " << chipPath << " consumer: " << consumername  << std::endl;
 
     // Config the pin as input and detecting falling and rising edegs
     gpiod::line_config line_cfg;
@@ -62,14 +67,16 @@ void IRSensor::initSensor()
         gpiod::line_settings()
         .set_direction(gpiod::line::direction::INPUT)
         .set_edge_detection(gpiod::line::edge::BOTH));
-
+    std::cout << "this is redicolous" << std::endl;
     chip = std::make_shared<gpiod::chip>(chipPath);
-
+    std::cout << "this is redicolous !  !!!!!!!!!!!!!!" << std::endl;
     auto builder = chip->prepare_request();
     builder.set_consumer(consumername);
     builder.set_line_config(line_cfg);
     request = std::make_shared<gpiod::line_request>(builder.do_request());
+    std::cout << "this is redicolous1111111111111111111111111111" << std::endl;
     verifyHardware();
+    std::cout << "this is redicolous 222222222222222222222" << std::endl;
 }
 
 void IRSensor::readSensor(gpiod::edge_event e)
@@ -146,20 +153,27 @@ void IRSensor::run(TrafficState state)
 
 void IRSensor::verifyHardware()
 {
-    auto req = chip->prepare_request()
-                   .set_consumer("get-line-value")
-                   .add_line_settings(GPIOPin,
-                                      gpiod::line_settings().set_direction(gpiod::line::direction::INPUT))
-                   .do_request();
-    gpiod::line::value value = req.get_value(GPIOPin);
-    if (value != gpiod::line::value::ACTIVE)
+    try
     {
-        std::cout << "GPIO " << GPIOPin << " is connected to the sensor" << std::endl;
-        sensorState = HardwareState::READY;
-    }
-    else
+        // auto req = chip->prepare_request()
+        //                .set_consumer("get-line-value")
+        //                .add_line_settings(GPIOPin,
+        //                                   gpiod::line_settings().set_direction(gpiod::line::direction::INPUT))
+        //                .do_request();
+        gpiod::line::value value = request->get_value(GPIOPin);
+        if (value != gpiod::line::value::ACTIVE)
+        {
+            std::cout << "GPIO " << GPIOPin << " is connected to the sensor" << std::endl;
+            sensorState = HardwareState::READY;
+        }
+        else
+        {
+            std::cout << "GPIO " << GPIOPin << " is not connected to the sensor or value cannot be read" << std::endl;
+            sensorState = HardwareState::READY;
+        }
+    }catch (const std::exception& e)
     {
-        std::cout << "GPIO " << GPIOPin << " is not connected to the sensor or value cannot be read" << std::endl;
+        std::cout << "Error: " << e.what() << std::endl;
         sensorState = HardwareState::ERROR;
     }
 }
@@ -170,16 +184,18 @@ void IRSensor::worker()
     {
         try
         {
-            bool res = request->wait_edge_events(std::chrono::milliseconds(maxBlockTime));
+            bool res = request->wait_edge_events(std::chrono::milliseconds(readInterval));
             std::cout << "ahaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa!" << std::endl;
             if (res)
             {
+                std::cout << "eedge event detected !!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
                 gpiod::edge_event_buffer buffer;
                 request->read_edge_events(buffer, 1);
                 readSensor(buffer.get_event(0));
             }
             else
             {
+                std::cout << "TIme out occurred ????????????????????????????";
                 verifyHardware();
                 if (sensorState != HardwareState::READY)
                 {

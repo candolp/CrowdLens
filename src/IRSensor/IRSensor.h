@@ -63,7 +63,7 @@ private:
     const ConfigLoader& config;
     int lastReadingTime = 0;
     TrafficState lastState = TrafficState::NO_TRAFFIC;
-    int maxBlockTime = 100000;
+    int maxBlockTime = 30000;
     int GPIOPin = 17;
     int CHIPNo = 0;
     IRSensorType sensorType = IRSensorType::DIGITAL;

@@ -7,6 +7,7 @@
 #include <stdio.h>
 
 #include "../HardwareOutput/LEDOutput.h"
+#include "../IRSensor/IRSensor.h"
 
 
 int main() {
@@ -17,11 +18,19 @@ int main() {
 #endif
 
     std::cout << "CrowdLense is Running ..." << std::endl;
-    LEDOutput ledOutput  = LEDOutput(17, 0);
-    ledOutput.run(TrafficState::TRAFFIC);
-    std::this_thread::sleep_for(std::chrono::milliseconds(60000));
-    ledOutput.stop(TrafficState::NO_TRAFFIC);
+    LEDOutput greenLED  = LEDOutput(22, 0);
+    LEDOutput redLED  = LEDOutput(10, 0);
+    IRSensor isensor(config);
+    // isensor.registerEventRunnable(greenLED);
+    // isensor.registerEventRunnable(redLED);
+    // isensor.run(TrafficState::NO_TRAFFIC);
+    redLED.run(TrafficState::TRAFFIC);
+    greenLED.run(TrafficState::TRAFFIC);
+    std::this_thread::sleep_for(std::chrono::milliseconds(6000));
     printf("Press enter\n");
     getchar();
+    greenLED.stop(TrafficState::NO_TRAFFIC);
+    redLED.stop(TrafficState::NO_TRAFFIC);
+    isensor.stop(TrafficState::NO_TRAFFIC);
     return 0;
 }
