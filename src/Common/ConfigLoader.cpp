@@ -12,9 +12,9 @@
 ConfigLoader::ConfigLoader()
 {
 #ifdef CONFIG_PATH
-    ConfigLoader config(CONFIG_PATH);
+     ConfigLoader(CONFIG_PATH);
 #else
-    ConfigLoader config("config.yaml");
+    ConfigLoader("config.yaml");
 #endif
 }
 
