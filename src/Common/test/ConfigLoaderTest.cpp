@@ -11,7 +11,7 @@ void testConfigLoading()
 #ifdef CONFIG_PATH
     ConfigLoader config(CONFIG_PATH);
 #else
-    ConfigLoader config("config.yaml");
+    ConfigLoader config("src/config.yaml");
 #endif
 
     // Test simple value
