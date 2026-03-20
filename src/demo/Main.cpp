@@ -18,13 +18,13 @@ int main() {
 #endif
 
     std::cout << "CrowdLense is Running ..." << std::endl;
-    LEDOutput greenLED  = LEDOutput(22, 0);
-    LEDOutput redLED  = LEDOutput(10, 0);
+    LEDOutput greenLED  = LEDOutput(22, 0, TrafficState::TRAFFIC);
+    LEDOutput redLED  = LEDOutput(10, 0,TrafficState::STAMPEDE);
     IRSensor isensor(config);
     // isensor.registerEventRunnable(greenLED);
     // isensor.registerEventRunnable(redLED);
     // isensor.run(TrafficState::NO_TRAFFIC);
-    redLED.run(TrafficState::TRAFFIC);
+    redLED.run(TrafficState::STAMPEDE);
     greenLED.run(TrafficState::TRAFFIC);
     std::this_thread::sleep_for(std::chrono::milliseconds(6000));
     printf("Press enter\n");

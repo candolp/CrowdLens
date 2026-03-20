@@ -10,6 +10,7 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     libopencv-dev \
     libcamera-dev \
+    dos2unix \
     libgpiod-dev \
     && rm -rf /var/lib/apt/lists/*
 
@@ -18,6 +19,9 @@ WORKDIR /app
 
 # Copy the project files into the container
 COPY . .
+
+# Convert all files from DOS to Unix line endings
+RUN find . -type f -exec dos2unix {} \;
 
 # Change to src directory
 #WORKDIR /app/src

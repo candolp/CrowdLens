@@ -20,10 +20,10 @@ class LEDOutput : public TrafficEventHandler
 {
 public:
     LEDOutput();
-    LEDOutput(const ConfigLoader& config);
-    LEDOutput(const ConfigLoader& config, bool skipInit);
-    LEDOutput(const ConfigLoader& config, int pinNO);
-    LEDOutput( int pinNO, int chipNO);
+    LEDOutput(const ConfigLoader& config, const TrafficState& indicationState);
+    LEDOutput(const ConfigLoader& config, bool skipInit, const TrafficState& indicationState);
+    LEDOutput(const ConfigLoader& config, int pinNO, const TrafficState& indicationState);
+    LEDOutput( int pinNO, int chipNO, const TrafficState& indicationState);
 
     /**
    * Loads configuration settings from the provided ConfigLoader.
@@ -32,10 +32,19 @@ public:
    */
     void loadConfig(const ConfigLoader& config);
 
+    /**
+     * Starts the IR sensor and begins periodic reading based on configured read_interval.
+     * Initializes the GPIO pin and starts the timer for traffic detection.
+     */
+    void run(TrafficState state) override;
+
 private:
     int GPIOPin = 17;
     int CHIPNo = 0;
     bool available = false;
+    //the state for which  the LED will be turn on.
+    //this  enables the system to use different LED for different indication
+    TrafficState _indicationState = TrafficState::TRAFFIC;
     // GPIO persistence
     std::shared_ptr<gpiod::chip> chip;
     std::shared_ptr<gpiod::line_request> request;

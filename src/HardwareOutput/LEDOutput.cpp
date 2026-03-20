@@ -13,28 +13,31 @@ LEDOutput::LEDOutput()
     throw std::runtime_error("LED output requires configuration or pin and chip numbers");
 }
 
-LEDOutput::LEDOutput(const ConfigLoader& config, bool skipInit)
+LEDOutput::LEDOutput(const ConfigLoader& config, bool skipInit, const TrafficState& indicationState)
 {loadConfig(config);
     if (!skipInit)
     {
         LEDOutput::initHardware();
+        _indicationState = indicationState;
     }
 
 }
 
-LEDOutput::LEDOutput(int pinNO, int chipNO)
+LEDOutput::LEDOutput(int pinNO, int chipNO, const TrafficState& indicationState)
 {
     GPIOPin = pinNO;
     CHIPNo = chipNO;
     available = true;
     LEDOutput::initHardware();
+    _indicationState = indicationState;
 }
 
-LEDOutput::LEDOutput(const ConfigLoader& config, int pinNO)
+LEDOutput::LEDOutput(const ConfigLoader& config, int pinNO, const TrafficState& indicationState)
 {
     loadConfig(config);
     GPIOPin = pinNO;
     LEDOutput::initHardware();
+    _indicationState = indicationState;
 }
 
 
@@ -66,6 +69,22 @@ void LEDOutput::initHardware()
     builder.set_consumer(consumername);
     builder.set_line_config(line_cfg);
     request = std::make_shared<gpiod::line_request>(builder.do_request());
+}
+
+void LEDOutput::run(const TrafficState state)
+{
+    //only handle the event if the propagated state matches the expected state for action
+    if (_indicationState == state)
+    {
+        traffic_state = state;
+        runState = RunState::RUNNING;
+        // Initialize sensor hardware
+        workerThread = std::thread(&LEDOutput::worker, this);
+    }else
+    {
+        //stopping the LED because the dependant traffic state has changed for the current LED indication
+        stop(state);
+    }
 }
 
 void LEDOutput::worker()

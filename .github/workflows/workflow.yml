@@ -7,22 +7,22 @@ on:
 
 jobs:
   test:
-    runs-on: debian:latest
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Install dependencies
+      - name: Build Docker image
+        run: docker build -t crowdlens-test .
+
+      - name: Run Docker container and capture output
         run: |
-          sudo apt-get update
-          sudo apt-get install -y cmake build-essential libopencv-dev libcamera-dev libgpiod-dev 
-
-      - name: Configure CMake
-        run: cmake -B build -S .
-
-      - name: Build
-        run: cmake --build build
-
-      - name: Run tests
-        run: ctest --test-dir build --output-on-failure
+          docker run --rm crowdlens-test > docker-test.log 2>&1
+          tail -n 2 docker-test.log
+          if tail -n 2 docker-test.log | grep -q "100% tests passed"; then
+            echo "Test passed"
+          else
+            echo "Test failed: expected '100% tests passed' in the last 2 lines"
+            exit 1
+          fi
