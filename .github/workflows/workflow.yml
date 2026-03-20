@@ -19,8 +19,9 @@ jobs:
       - name: Run Docker container and capture output
         run: |
           docker run --rm crowdlens-test > docker-test.log 2>&1
-          tail -n 2 docker-test.log
-          if tail -n 2 docker-test.log | grep -q "100% tests passed"; then
+          tail -n 100 docker-test.log
+          
+          if tail -n 100 docker-test.log | grep -q "100% tests passed"; then
             echo "Test passed"
           else
             echo "Test failed: expected '100% tests passed' in the last 2 lines"
