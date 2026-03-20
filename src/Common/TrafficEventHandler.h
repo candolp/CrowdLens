@@ -18,6 +18,14 @@ public:
 	eventHandlers.push_back(&h);
     }
 
+	void run(TrafficState state) override
+	{
+		traffic_state = state;
+		runState = RunState::RUNNING;
+		// Starting thread
+		workerThread = std::thread(&TrafficEventHandler::worker, this);
+	}
+
 	/**
 	 * Stops the traffic event handler and notifies all registered event handlers.
 	 * Terminates the worker thread and propagates the stop signal to all subscribers.
@@ -53,13 +61,7 @@ protected:
 			r->run(trafficState);
 		}
 	}
-	void run(TrafficState state) override
-	{
-		traffic_state = state;
-		runState = RunState::RUNNING;
-		// Starting thread
-		workerThread = std::thread(&TrafficEventHandler::worker, this);
-	}
+
 
 	std::thread workerThread;
 
