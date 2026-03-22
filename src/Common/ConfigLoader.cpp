@@ -14,7 +14,7 @@ ConfigLoader::ConfigLoader()
 #ifdef CONFIG_PATH
      ConfigLoader(CONFIG_PATH);
 #else
-    ConfigLoader("config.yaml");
+    ConfigLoader("src/config.yaml");
 #endif
 }
 
