@@ -4,7 +4,7 @@
 
 #ifndef CROWDLENS_RUNNABLE_H
 #define CROWDLENS_RUNNABLE_H
-#include "CrowLenseState.h"
+#include "CrowdLensState.h"
 
 // An interface which can be added
 // to the receiving class. We call it runnable
