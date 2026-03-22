@@ -7,6 +7,4 @@ add_executable(CrowdLens
         Main.cpp
 )
 
-target_link_libraries(CrowdLens
-        Common
-        pthread)
+target_link_libraries(CrowdLens PRIVATE AIDetection CameraCapture Notification Display)
