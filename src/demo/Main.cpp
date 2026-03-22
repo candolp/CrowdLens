@@ -67,6 +67,10 @@ int main(int argc, char* argv[]) {
     analyser.setDensityThreshold(std::stof(loader.getValue("thresholds:density", "0.7")));
     analyser.setChokepointThreshold(std::stof(loader.getValue("thresholds:chokepoint", "0.85")));
     analyser.setFlowMagnitudeThreshold(std::stof(loader.getValue("thresholds:flow_magnitude", "2.0")));
+    analyser.setPredictionHorizon(std::stof(loader.getValue("prediction:horizon", "10.0")));
+    analyser.setStampedeDensityThreshold(std::stof(loader.getValue("prediction:stampede_density", "0.9")));
+    analyser.setPredictionWindowSize(static_cast<size_t>(std::stoi(loader.getValue("prediction:window_size", "10"))));
+    analyser.setMinTrendSlope(std::stof(loader.getValue("prediction:min_trend_slope", "0.005")));
 
     // register alert subscribers
     cl::ConsoleEventHandler console;
