@@ -65,6 +65,12 @@ optical_flow:
   poly_n: 5
   poly_sigma: 1.2
 
+prediction:
+  stampede_density: 0.9
+  horizon: 10.0
+  window_size: 10
+  min_trend_slope: 0.005
+
 zones:
   names: entrance_1, exit_1, main_hall
   zone.entrance_1:
