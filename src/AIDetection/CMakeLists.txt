@@ -5,6 +5,7 @@ add_library(AIDetection
       ZoneManager.cpp
       OpenCVFrameProcessor.cpp
       CrowdAnalyser.cpp
+      StampedePredictor.cpp
 )
 
 target_include_directories(AIDetection PUBLIC ${CMAKE_SOURCE_DIR}/src)
