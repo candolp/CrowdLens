@@ -1,8 +1,18 @@
-cmake_minimum_required(VERSION 3.6)
+cmake_minimum_required(VERSION 3.10)
 set(CMAKE_CXX_STANDARD 20)
 
-#project(CameraCapture_test VERSION 0.0.1 LANGUAGES CXX)
-#
-#add_executable(camera_capture_test camera_capture_test.cpp)
-#
-#target_link_libraries(CameraCapture_test PRIVATE LIB_Solenoid_Controller)
+project(AIDetection_test)
+
+find_package(OpenCV REQUIRED)
+
+add_executable(test_hog 
+    test_hog.cpp 
+    ../HOGDetector.cpp
+)
+
+target_include_directories(test_hog PRIVATE 
+    ${OpenCV_INCLUDE_DIRS}
+    ..
+)
+
+target_link_libraries(test_hog PRIVATE ${OpenCV_LIBS} pthread)
