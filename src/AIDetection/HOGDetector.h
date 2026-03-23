@@ -28,6 +28,7 @@ public:
     void setCountCallback(std::function<void(int)> callback);
     int getPersonCount() const;
     bool start(const std::string& video_source);
+    bool startCamera(int device_index = 0);
     void updateFrame(cv::Mat& frame);
     void stop();
 };

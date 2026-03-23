@@ -27,6 +27,20 @@ bool HOGDetector::start(const std::string& video_source) {
     return true;
 }
 
+bool HOGDetector::startCamera(int device_index) {
+    cap.open(device_index, cv::CAP_V4L2);
+    if (!cap.isOpened()) {
+        std::cerr << "Failed to open camera" << std::endl;
+        return false;
+    }
+    cap.set(cv::CAP_PROP_FRAME_WIDTH, 640);
+    cap.set(cv::CAP_PROP_FRAME_HEIGHT, 480);
+    cap.set(cv::CAP_PROP_FPS, 30);
+    running = true;
+    detection_thread = std::thread(&HOGDetector::detectionLoop, this);
+    return true;
+}
+
 void HOGDetector::updateFrame(cv::Mat& frame) {
     std::lock_guard<std::mutex> lock(frame_mutex);
     frame.copyTo(current_frame);
