@@ -37,6 +37,7 @@ public:
 		{
 			r->stop(traffic_state);
 		}
+
 		if (workerThread.joinable()) workerThread.join();
 	}
 

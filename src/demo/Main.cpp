@@ -6,6 +6,7 @@
 #include <string>
 #include <stdio.h>
 
+#include "../HardwareOutput/BuzzerOutput.h"
 #include "../HardwareOutput/LEDOutput.h"
 #include "../IRSensor/IRSensor.h"
 
@@ -20,9 +21,16 @@ int main() {
     std::cout << "CrowdLense is Running ..." << std::endl;
     LEDOutput greenLED  = LEDOutput(22, 0, TrafficState::TRAFFIC);
     LEDOutput redLED  = LEDOutput(10, 0,TrafficState::STAMPEDE);
+    BUZZEROutput trafficBuzzer = BUZZEROutput(config, 18, TrafficState::TRAFFIC);
+    trafficBuzzer.setBuzzerFrequency(1500);
+    trafficBuzzer.setBuzzerBeatsPerCycle(2);
+    BUZZEROutput stampedeBuzzer = BUZZEROutput(config, 18, TrafficState::STAMPEDE);
+    stampedeBuzzer.setBuzzerFrequency(1500);
+    stampedeBuzzer.setBuzzerBeatsPerCycle(5);
     IRSensor isensor(config);
     // isensor.registerEventRunnable(greenLED);
     // isensor.registerEventRunnable(redLED);
+    isensor.registerEventRunnable(trafficBuzzer);
     // isensor.run(TrafficState::NO_TRAFFIC);
     redLED.run(TrafficState::STAMPEDE);
     greenLED.run(TrafficState::TRAFFIC);

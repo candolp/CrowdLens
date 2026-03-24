@@ -8,7 +8,7 @@ add_executable(CrowdLens
 
 target_link_libraries(CrowdLens
         Common
-        LEDOutput
+        HardwareOutput
         pthread
         IRSensor
         gpiodcxx)

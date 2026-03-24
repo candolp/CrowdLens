@@ -20,7 +20,7 @@ In the Demo's Main application Objects are created from each module. multiple ob
 The modules extends [TrafficEventHandler.h](src/Common/TrafficEventHandler.h) class. This class provides the interface for all the modules. Worker Threat, callback function and a start and stop function are provided.
 Any class extending this class can be used as a module. which can be registered in another moules as an event handler.
 
-### Syste Flow
+### System Flow
 The Crowd Movement Flow is monitored by the IR Sensor. 
 The Camera Capture is used to capture the image.
 The AI Detection is used to detect the crowd movement.

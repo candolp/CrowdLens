@@ -8,13 +8,24 @@
 #include <format>
 #include <gpiod.hpp>
 
+#include "GPIODigitalOutput.h"
+
 LEDOutput::LEDOutput()
 {
     throw std::runtime_error("LED output requires configuration or pin and chip numbers");
 }
 
+LEDOutput::LEDOutput(const ConfigLoader& config, const TrafficState& indicationState)
+{
+    LEDOutput::loadConfig(config);
+        LEDOutput::initHardware();
+        _indicationState = indicationState;
+
+}
+
 LEDOutput::LEDOutput(const ConfigLoader& config, bool skipInit, const TrafficState& indicationState)
-{loadConfig(config);
+{
+    LEDOutput::loadConfig(config);
     if (!skipInit)
     {
         LEDOutput::initHardware();
@@ -28,15 +39,15 @@ LEDOutput::LEDOutput(int pinNO, int chipNO, const TrafficState& indicationState)
     GPIOPin = pinNO;
     CHIPNo = chipNO;
     available = true;
-    LEDOutput::initHardware();
+    GPIODigitalOutput::initHardware();
     _indicationState = indicationState;
 }
 
 LEDOutput::LEDOutput(const ConfigLoader& config, int pinNO, const TrafficState& indicationState)
 {
-    loadConfig(config);
+    LEDOutput::loadConfig(config);
     GPIOPin = pinNO;
-    LEDOutput::initHardware();
+    GPIODigitalOutput::initHardware();
     _indicationState = indicationState;
 }
 
@@ -50,26 +61,7 @@ void LEDOutput::loadConfig(const ConfigLoader& config)
 }
 
 
-void LEDOutput::initHardware()
-{
-    // Initialize GPIO chip and line request
-    const std::string chipPath = std::format("/dev/gpiochip{}", CHIPNo);
-    const std::string consumername = std::format("gpioconsumer_{}_{}", CHIPNo, GPIOPin);
 
-    // Config the pin as output
-    gpiod::line_config line_cfg;
-    line_cfg.add_line_settings(
-        GPIOPin,
-        gpiod::line_settings()
-        .set_direction(gpiod::line::direction::OUTPUT));
-
-    chip = std::make_shared<gpiod::chip>(chipPath);
-
-    auto builder = chip->prepare_request();
-    builder.set_consumer(consumername);
-    builder.set_line_config(line_cfg);
-    request = std::make_shared<gpiod::line_request>(builder.do_request());
-}
 
 void LEDOutput::run(const TrafficState state)
 {
@@ -105,5 +97,18 @@ void LEDOutput::worker()
     }
 }
 
+
+void LEDOutput::stop(TrafficState traffic_state) {
+    runState = RunState::STOPPED;
+    for(auto & r : eventHandlers)
+    {
+        r->stop(traffic_state);
+    }
+    if (request != nullptr && request)
+    {
+        request->set_value(GPIOPin, gpiod::line::value::INACTIVE);
+    }
+    if (workerThread.joinable()) workerThread.join();
+}
 
 

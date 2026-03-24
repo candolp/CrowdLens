@@ -121,7 +121,7 @@ void IRSensor::updateState(const TrafficState& newState)
     }
     else if (newState == TrafficState::NO_TRAFFIC && elapsedTime > maxBlockTime)
     {
-        traffic_state = TrafficState::TRAFFIC;
+        traffic_state = TrafficState::NO_TRAFFIC;
         //update dependent event
         eventCallback(traffic_state);
     }
@@ -131,10 +131,6 @@ void IRSensor::updateState(const TrafficState& newState)
         lastReadingTime = std::chrono::duration_cast<std::chrono::milliseconds>(
             std::chrono::system_clock::now().time_since_epoch()).count();;
         lastState = newState;
-    }
-    else
-    {
-        lastReadingTime += readInterval;
     }
 }
 
@@ -155,11 +151,6 @@ void IRSensor::verifyHardware()
 {
     try
     {
-        // auto req = chip->prepare_request()
-        //                .set_consumer("get-line-value")
-        //                .add_line_settings(GPIOPin,
-        //                                   gpiod::line_settings().set_direction(gpiod::line::direction::INPUT))
-        //                .do_request();
         gpiod::line::value value = request->get_value(GPIOPin);
         if (value != gpiod::line::value::ACTIVE)
         {
@@ -168,12 +159,13 @@ void IRSensor::verifyHardware()
         }
         else
         {
-            std::cout << "GPIO " << GPIOPin << " is not connected to the sensor or value cannot be read" << std::endl;
+            std::cout << "GPIO " << GPIOPin << " is  connected to the sensor and the value is LOW" << std::endl;
             sensorState = HardwareState::READY;
         }
     }catch (const std::exception& e)
     {
         std::cout << "Error: " << e.what() << std::endl;
+        std::cout << "GPIO " << GPIOPin << " is not connected to the sensor" << std::endl;
         sensorState = HardwareState::ERROR;
     }
 }
@@ -185,17 +177,14 @@ void IRSensor::worker()
         try
         {
             bool res = request->wait_edge_events(std::chrono::milliseconds(readInterval));
-            std::cout << "ahaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa!" << std::endl;
             if (res)
             {
-                std::cout << "eedge event detected !!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
                 gpiod::edge_event_buffer buffer;
                 request->read_edge_events(buffer, 1);
                 readSensor(buffer.get_event(0));
             }
             else
             {
-                std::cout << "TIme out occurred ????????????????????????????";
                 verifyHardware();
                 if (sensorState != HardwareState::READY)
                 {
