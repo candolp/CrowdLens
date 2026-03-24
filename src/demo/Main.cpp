@@ -6,10 +6,39 @@
 #include <string>
 #include <stdio.h>
 
+#include "../HardwareOutput/BuzzerOutput.h"
+#include "../HardwareOutput/LEDOutput.h"
+#include "../IRSensor/IRSensor.h"
+
 
 int main() {
+#ifdef CONFIG_PATH
+    ConfigLoader config(CONFIG_PATH);
+#else
+    ConfigLoader config("config.yaml");
+#endif
+
     std::cout << "CrowdLense is Running ..." << std::endl;
+    LEDOutput greenLED  = LEDOutput(22, 0, TrafficState::TRAFFIC);
+    LEDOutput redLED  = LEDOutput(10, 0,TrafficState::STAMPEDE);
+    BUZZEROutput trafficBuzzer = BUZZEROutput(config, 18, TrafficState::TRAFFIC);
+    trafficBuzzer.setBuzzerFrequency(1500);
+    trafficBuzzer.setBuzzerBeatsPerCycle(2);
+    BUZZEROutput stampedeBuzzer = BUZZEROutput(config, 18, TrafficState::STAMPEDE);
+    stampedeBuzzer.setBuzzerFrequency(1500);
+    stampedeBuzzer.setBuzzerBeatsPerCycle(5);
+    IRSensor isensor(config);
+    // isensor.registerEventRunnable(greenLED);
+    // isensor.registerEventRunnable(redLED);
+    isensor.registerEventRunnable(trafficBuzzer);
+    // isensor.run(TrafficState::NO_TRAFFIC);
+    redLED.run(TrafficState::STAMPEDE);
+    greenLED.run(TrafficState::TRAFFIC);
+    std::this_thread::sleep_for(std::chrono::milliseconds(6000));
     printf("Press enter\n");
     getchar();
+    greenLED.stop(TrafficState::NO_TRAFFIC);
+    redLED.stop(TrafficState::NO_TRAFFIC);
+    isensor.stop(TrafficState::NO_TRAFFIC);
     return 0;
 }
