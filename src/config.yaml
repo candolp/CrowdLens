@@ -54,6 +54,7 @@ thresholds:
   density: 0.25
   chokepoint: 0.85
   flow_magnitude: 2.0
+  warmup_frames: 30
 
 frame_processor:
   pixels_per_person: 200
