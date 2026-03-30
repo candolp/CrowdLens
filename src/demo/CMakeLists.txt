@@ -11,7 +11,12 @@ target_link_libraries(CrowdLens
         HardwareOutput
         pthread
         IRSensor
-        gpiodcxx)
+        gpiodcxx
+        AIDetection
+        CameraCapture
+        Notification
+        Display
+        )
 
 #target_compile_definitions(Common PRIVATE
 #        CONFIG_PATH="${CMAKE_SOURCE_DIR}/src/config.yaml")

@@ -41,6 +41,8 @@ Notifications:
 Camera:
   enabled: false
   output_file: output.avi
+  index: -1
+  video_file: videos/video2.mp4
 
 #AI model config
 AI:
@@ -48,4 +50,30 @@ AI:
   model_file: models/model.tflite
   model: OPENCV
 
+thresholds:
+  density: 0.25
+  chokepoint: 0.85
+  flow_magnitude: 2.0
 
+frame_processor:
+  pixels_per_person: 200
+
+optical_flow:
+  pyr_scale: 0.5
+  levels: 3
+  win_size: 15
+  iterations: 3
+  poly_n: 5
+  poly_sigma: 1.2
+
+zones:
+  names: entrance_1, exit_1, main_hall
+  zone.entrance_1:
+    type: ENTRANCE
+    points: 0,0 200,0 200,432 0,432
+  zone.exit_1:
+    type: EXIT
+    points: 568,0 768,0 768,432 568,432
+  zone.main_hall:
+    type: GENERAL
+    points: 200,0 568,0 568,432 200,432

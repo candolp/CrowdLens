@@ -5,6 +5,16 @@ set(CMAKE_CXX_STANDARD 20)
 
 enable_testing()
 
+
+include(FetchContent)
+FetchContent_Declare(
+        googletest
+        GIT_REPOSITORY https://github.com/google/googletest.git
+        GIT_TAG        v1.14.0
+)
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(googletest)
+
 #add subdirectory containing common codes
 add_subdirectory(${CMAKE_SOURCE_DIR}/src/Common)
 
@@ -31,6 +41,8 @@ configure_file(${CMAKE_SOURCE_DIR}/src/config.yaml ${CMAKE_BINARY_DIR}/config.ya
 
 # Define CONFIG_PATH for all targets
 add_compile_definitions(CONFIG_PATH="${CMAKE_BINARY_DIR}/config.yaml")
+#add subdirectory containing visual overlay / display window
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/Display)
 
 ##compile options to check the code
 add_compile_options(-Wall -Wconversion -Wextra -pedantic)

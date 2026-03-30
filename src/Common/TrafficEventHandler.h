@@ -5,6 +5,8 @@
 #include <vector>
 
 #include "Runnable.h"
+#include "AlertRunnable.h"
+#include "AlertEvent.h"
 
 // Demo which creates a callback interface as the abstract class "Runnable".
 // This then allows to register a callback.
@@ -26,6 +28,11 @@ public:
 		workerThread = std::thread(&TrafficEventHandler::worker, this);
 	}
 
+	// Registers an alert subscriber; will receive onAlert() calls for each fired alert
+	void registerAlertRunnable(cl::AlertRunnable& r) {
+		alertRunnables_.push_back(&r);
+	}
+
 	/**
 	 * Stops the traffic event handler and notifies all registered event handlers.
 	 * Terminates the worker thread and propagates the stop signal to all subscribers.
@@ -33,6 +40,9 @@ public:
 	 */
 	void stop(TrafficState traffic_state) override {
 		runState = RunState::STOPPED;
+		for (cl::AlertRunnable* r : alertRunnables_) {
+			r->stop(traffic_state);
+		}
 		for(auto & r : eventHandlers)
 		{
 			r->stop(traffic_state);
@@ -64,6 +74,14 @@ protected:
 	}
 
 
+	// Fans out an alert to all AlertRunnable subscribers via onAlert().
+	// Separate from eventCallback because AlertEvent carries more than just a TrafficState
+	void alertCallback(const cl::AlertEvent& ev) {
+		for (cl::AlertRunnable* r : alertRunnables_) {
+			r->onAlert(ev);
+		}
+	}
+
 	std::thread workerThread;
 
 	RunState runState = RunState::STOPPED;
@@ -71,6 +89,8 @@ protected:
     // vector of all the subscribers
     std::vector<Runnable*> eventHandlers;
 
+private:
+	std::vector<cl::AlertRunnable*> alertRunnables_;
 
 };
 

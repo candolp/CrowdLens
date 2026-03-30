@@ -18,12 +18,13 @@ jobs:
 
       - name: Run Docker container and capture output
         run: |
-          docker run --rm crowdlens-test > docker-test.log 2>&1
-          tail -n 300 docker-test.log
-          
+          docker run --rm crowdlens-test > docker-test.log 2>&1 || true
+          echo "=== Full Container Output ==="
+          cat docker-test.log          # print everything, not just tail
           if tail -n 10 docker-test.log | grep -q "100% tests passed"; then
-            echo -e "\033[0;32mTest passed\033[0m"
+            echo "Test passed"
           else
-            echo -e "\033[0;31mTest failed: expected '100% tests passed' in the last 2 lines\033[0m"
+            echo "Test failed"
             exit 1
           fi
+        shell: /usr/bin/bash -e {0}
