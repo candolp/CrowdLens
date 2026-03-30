@@ -28,12 +28,12 @@ Hardware_output:
 #email notification config
 Notifications:
   enabled: true
-  sender_email: candolpd@gmail.com
-  receiver_email: 3112938d@student.gla.ac.uk,candolpd@gmail.com
+  sender_email: crowdlens17@gmail.com
+  receiver_email: 3112938d@student.gla.ac.uk, candolpd@gmail.com, 3164666B@student.gla.ac.uk
   smtp_server: smtp.gmail.com
   smtp_port: 587
-  smtp_password:
-  smtp_username: candolpd@gmail.com
+  smtp_password: 
+  smtp_username: crowdlens17@gmail.com
   template_file: templates/email.html
   resent_time: 10
 
