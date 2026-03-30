@@ -8,9 +8,13 @@
 namespace cl {
 
 enum class AlertType {
-    CONGESTION,
-    CHOKEPOINT,
-    FLOW_REVERSAL
+    // reactive: fires when the condition is already present
+    CONGESTION, // density has crossed densityThreshold_
+    CHOKEPOINT, // density high + flow already low
+    FLOW_REVERSAL,
+    // predictive: fires when the trend will reach the threshold within horizon
+    STAMPEDE_RISK, // density rising fast enough to hit stampede threshold within horizon
+    CHOKEPOINT_PREDICTED // density rising and flow falling; both will converge to chokepoint within horizon
 };
 
 enum class AlertSeverity {
