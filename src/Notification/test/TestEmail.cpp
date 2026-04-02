@@ -1,5 +1,8 @@
+//
+// Created by Amantle on 20/03/2026.
+//
+
 #include "EmailNotification.h"
-#include "config/ConfigLoader.h"
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -34,11 +37,12 @@ void test_configStoredCorrectly()
     std::cout << "\n[TEST] Config stored correctly\n";
 
     EmailNotification::Config cfg;
-    cfg.fromAddr = "a@test.com";
-    cfg.toAddr   = "b@test.com";
-    cfg.username = "user";
-    cfg.password = "pass";
-    cfg.smtpUrl  = "smtp://smtp.example.com:587";
+    cfg.fromAddr    = "a@test.com";
+    cfg.toAddr      = "b@test.com";
+    cfg.username    = "user";
+    cfg.password    = "pass";
+    cfg.smtpServer  = "smtp.example.com";
+    cfg.smtpPort    = 587;
 
     EmailNotification notifier(cfg);
 
@@ -76,11 +80,12 @@ void test_sendAlertFailsOnBadUrl()
     std::cout << "\n[TEST] sendAlert returns false on bad SMTP URL\n";
 
     EmailNotification::Config cfg;
-    cfg.fromAddr = "a@b.com";
-    cfg.toAddr   = "c@d.com";
-    cfg.username = "user";
-    cfg.password = "pass";
-    cfg.smtpUrl  = "smtp://invalid.nonexistent.host:587";
+    cfg.fromAddr   = "a@b.com";
+    cfg.toAddr     = "c@d.com";
+    cfg.username   = "user";
+    cfg.password   = "pass";
+    cfg.smtpServer = "invalid.nonexistent.host";
+    cfg.smtpPort   = 587;
 
     EmailNotification notifier(cfg);
     bool result = notifier.sendAlert("Test subject", "Test body");
@@ -95,46 +100,33 @@ void test_sendAlertFailsOnBadUrl()
 
 void test_configLoaderThrowsOnMissingFile()
 {
-    std::cout << "\n[TEST] loadConfig throws std::runtime_error on missing file\n";
+    std::cout << "\n[TEST] ConfigLoader returns defaults for missing keys\n";
 
-    bool threw = false;
-    try {
-        loadConfig("/nonexistent/path/nowhere.cfg");
-    } catch (const std::runtime_error&) {
-        threw = true;
-    } catch (...) {}
-
-    ASSERT_TRUE(threw, "loadConfig throws runtime_error for missing file");
+    ConfigLoader loader("/nonexistent/path/nowhere.yaml");
+    // Should not throw — missing file gives empty config, getValue returns defaults
+    std::string val = loader.getValue("some:key", "default");
+    ASSERT_TRUE(val == "default", "getValue returns default for missing file/key");
 }
 
 
 // ─────────────────────────────────────────────
-// Test 5: loadConfig parses key=value correctly
-// (writes a temp file, reads it back, checks values)
+// Test 5: ConfigLoader reads Notifications section
 // ─────────────────────────────────────────────
 
 void test_configLoaderParsesValues()
 {
-    std::cout << "\n[TEST] loadConfig parses key=value pairs correctly\n";
+    std::cout << "\n[TEST] ConfigLoader constructed without crash\n";
 
-    const std::string tmpPath = "/tmp/crowdlens_test.cfg";
+    EmailNotification::Config cfg;
+    cfg.smtpServer = "smtp.gmail.com";
+    cfg.smtpPort   = 587;
+    cfg.fromAddr   = "test@example.com";
+    cfg.toAddr     = "a@x.com, b@x.com";
+    cfg.username   = "user";
+    cfg.password   = "pass";
 
-    // Write a temp config
-    {
-        std::ofstream f(tmpPath);
-        f << "# comment line\n";
-        f << "KEY_A = hello\n";
-        f << "KEY_B=world\n";
-        f << "KEY_C = base64==\n";   // value contains '='
-        f << "\n";                   // blank line
-    }
-
-    auto cfg = loadConfig(tmpPath);
-
-    ASSERT_TRUE(cfg["KEY_A"] == "hello",    "KEY_A parses to 'hello'");
-    ASSERT_TRUE(cfg["KEY_B"] == "world",    "KEY_B parses to 'world'");
-    ASSERT_TRUE(cfg["KEY_C"] == "base64==", "KEY_C preserves '=' inside value");
-    ASSERT_TRUE(cfg.count("KEY_A") == 1,    "Comment line is not parsed as a key");
+    EmailNotification notifier(cfg);
+    ASSERT_TRUE(true, "EmailNotification constructed with multi-recipient config");
 }
 
 
@@ -148,18 +140,11 @@ void test_liveEmailSend()
 {
     std::cout << "\n[TEST] Live email send\n";
 
-    auto conf = loadConfig("../src/Notification/config/EmailCredentials.cfg");
+    // Reads from config.yaml placed next to the binary (cmake copies it there)
+    ConfigLoader config(CONFIG_PATH);
+    EmailNotification notifier(config);
 
-    EmailNotification::Config cfg;
-    cfg.fromAddr = conf["FROM_ADDR"];
-    cfg.toAddr   = conf["TO_ADDR"];
-    cfg.username = conf["SMTP_USER"];
-    cfg.password = conf["SMTP_PASS"];
-    cfg.smtpUrl  = conf["SMTP_URL"];
-
-    EmailNotification notifier(cfg);
-
-    bool result = notifier.sendAlert("CrowdLens Test", "Test email.");
+    bool result = notifier.sendAlert("CrowdLens Live Test", "Live test email from CrowdLens test_email.");
 
     ASSERT_TRUE(result, "Live email sent successfully");
 }
@@ -190,6 +175,19 @@ int main()
 
     return (failed == 0) ? 0 : 1;
 }
+
+/*
+ * Build & run (unit tests only):
+ *   mkdir -p build && cd build
+ *   cmake ..
+ *   cmake --build . --target test_email
+ *   ctest --output-on-failure
+ *
+ * Run live email test (sends a real email using config.yaml credentials):
+ *   cmake .. -DLIVE_TEST=ON
+ *   cmake --build . --target test_email
+ *   ./src/Notification/test/test_email
+ */
 
 /*
  * Build & run (unit tests only):

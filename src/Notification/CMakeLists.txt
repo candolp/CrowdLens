@@ -13,10 +13,12 @@ add_library(Notification_lib STATIC
 target_include_directories(Notification_lib PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/config
+    ${CMAKE_SOURCE_DIR}/src/Common
     ${CURL_INCLUDE_DIRS}
 )
 
 target_link_libraries(Notification_lib PUBLIC
+    Common
     ${CURL_LIBRARIES}
 )
 
