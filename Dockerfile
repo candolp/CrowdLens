@@ -11,6 +11,8 @@ RUN apt-get update && apt-get install -y \
     git \
     libopencv-dev \
     libcamera-dev \
+    libcurl4-openssl-dev \
+    python3 \
     dos2unix \
     libgpiod-dev \
     && rm -rf /var/lib/apt/lists/*
