@@ -29,8 +29,11 @@ main thread via `tick()`. See [docs/architecture.md](docs/architecture.md) for t
 - Wide-Angle 1080p UVC-Compliant USB Camera Module
 - USB-C power supply (5V / 5A)
 - MicroSD card (32 GB+, Class 10 or better)
+- 3 LEDs (green, red, yellow)
+- Passive Buzzer
+- Mini Speaker
 
-<!-- TODO: Add link to docs/hardware-setup.md once hardware setup guide is written -->
+See [docs/hardware-setup.md](docs/hardware-setup.md) for the full pin assignment table and wiring setup diagram for each hardware module.
 
 ---
 
