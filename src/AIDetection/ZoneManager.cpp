@@ -35,7 +35,20 @@ void ZoneManager::loadConfig(const ConfigLoader& config) {
             if (comma != std::string::npos)
                 poly.emplace_back(std::stoi(token.substr(0, comma)), std::stoi(token.substr(comma + 1)));
         }
-        addZone(Zone(zoneName, poly, zoneTypeFromString(type)));
+        Zone zone(zoneName, poly, zoneTypeFromString(type));
+
+        std::string prefix = "zones:zone." + zoneName + ":";
+        std::string densityStr = config.getValue(prefix + "density_threshold", "");
+        std::string chokepointStr = config.getValue(prefix + "chokepoint_threshold", "");
+        std::string flowStr = config.getValue(prefix + "flow_magnitude_threshold", "");
+        std::string pppStr = config.getValue(prefix + "pixels_per_person", "");
+
+        if (!densityStr.empty()) zone.setDensityThreshold(std::stof(densityStr));
+        if (!chokepointStr.empty()) zone.setChokepointThreshold(std::stof(chokepointStr));
+        if (!flowStr.empty()) zone.setFlowMagnitudeThreshold(std::stof(flowStr));
+        if (!pppStr.empty()) zone.setPixelsPerPerson(std::stoi(pppStr));
+
+        addZone(std::move(zone));
     }
 }
 

@@ -62,6 +62,8 @@ public:
     void setPredictionWindowSize(size_t n);
     // minimum density-per-second rate before a trend is considered real
     void setMinTrendSlope(float slope);
+    // number of frames to skip alert evaluation while the bg model stabilises
+    void setWarmupFrames(int frames);
 
 private:
     // waits for frames and processes them; implements TrafficEventHandler::worker()
@@ -82,6 +84,8 @@ private:
     float densityThreshold_ = 0.7f; // 70% zone occupancy -> CONGESTION
     float chokepointThreshold_ = 0.85f; // 85% occupancy + low flow -> CHOKEPOINT
     float flowMagnitudeThreshold_ = 2.0f; // low-flow cutoff for chokepoint
+    int warmupFrames_ = 30; // frames to process before alerts are enabled
+    int frameCount_ = 0; // incremented each worker cycle, resets on run()
 
     StampedePredictor predictor_;
 };
