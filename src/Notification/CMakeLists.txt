@@ -7,7 +7,7 @@ find_package(CURL REQUIRED)
 # and the test executable can link against it without recompiling
 add_library(Notification_lib STATIC
     EmailNotification.cpp
-    config/ConfigLoader.cpp
+        ConsoleEventHandler.cpp
 )
 
 target_include_directories(Notification_lib PUBLIC
