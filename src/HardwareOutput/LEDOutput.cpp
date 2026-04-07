@@ -69,9 +69,13 @@ void LEDOutput::run(const TrafficState state)
     if (_indicationState == state)
     {
         traffic_state = state;
-        runState = RunState::RUNNING;
-        // Initialize sensor hardware
-        workerThread = std::thread(&LEDOutput::worker, this);
+        if (runState != RunState::RUNNING)
+        {
+            runState = RunState::RUNNING;
+            // Initialize sensor hardware
+
+            workerThread = std::thread(&LEDOutput::worker, this);
+        }
     }else
     {
         //stopping the LED because the dependant traffic state has changed for the current LED indication
