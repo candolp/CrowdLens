@@ -8,6 +8,8 @@
 #include <format>
 #include <gpiod.hpp>
 
+
+
 BUZZEROutput::BUZZEROutput()
 {
     throw std::runtime_error("BUZZER output requires configuration or pin and chip numbers");
@@ -17,7 +19,7 @@ BUZZEROutput::BUZZEROutput(const ConfigLoader& config, const TrafficState& indic
 {
     BUZZEROutput::loadConfig(config);
 
-    GPIODigitalOutput::initHardware();
+    BUZZEROutput::initHardware();
     _indicationState = indicationState;
 }
 
@@ -26,7 +28,7 @@ BUZZEROutput::BUZZEROutput(const ConfigLoader& config, bool skipInit, const Traf
     BUZZEROutput::loadConfig(config);
     if (!skipInit)
     {
-        GPIODigitalOutput::initHardware();
+        BUZZEROutput::initHardware();
         _indicationState = indicationState;
     }
 }
@@ -36,7 +38,7 @@ BUZZEROutput::BUZZEROutput(int pinNO, int chipNO, const TrafficState& indication
     GPIOPin = pinNO;
     CHIPNo = chipNO;
     available = true;
-    GPIODigitalOutput::initHardware();
+    BUZZEROutput::initHardware();
     _indicationState = indicationState;
 }
 
@@ -44,7 +46,7 @@ BUZZEROutput::BUZZEROutput(const ConfigLoader& config, int pinNO, const TrafficS
 {
     BUZZEROutput::loadConfig(config);
     GPIOPin = pinNO;
-    GPIODigitalOutput::initHardware();
+    BUZZEROutput::initHardware();
     _indicationState = indicationState;
 }
 
@@ -120,4 +122,32 @@ inline void BUZZEROutput::stop(TrafficState traffic_state)
         request->set_value(GPIOPin, gpiod::line::value::INACTIVE);
     }
     if (workerThread.joinable()) workerThread.join();
+}
+
+void BUZZEROutput::initHardware()
+{
+    // Initialize GPIO chip and line request
+    std::cout << "GPIO number is " << GPIOPin << std::endl;
+    const std::string chipPath = std::format("/dev/gpiochip{}", CHIPNo);
+    const std::string consumername = std::format("gpioconsumer_{}_{}", CHIPNo, GPIOPin);
+
+    try
+    {
+        // Config the pin as output
+        gpiod::line_config line_cfg;
+        line_cfg.add_line_settings(
+            GPIOPin,
+            gpiod::line_settings()
+            .set_direction(gpiod::line::direction::OUTPUT));
+
+        chip = std::make_shared<gpiod::chip>(chipPath);
+
+        auto builder = chip->prepare_request();
+        builder.set_consumer(consumername);
+        builder.set_line_config(line_cfg);
+        request = std::make_shared<gpiod::line_request>(builder.do_request());
+    }catch (const std::exception& e)
+    {
+        std::cout << "Error: GPIO initialization failed - "<< CHIPNo << " GPIOid"<< GPIOPin << e.what() << std::endl;
+    }
 }

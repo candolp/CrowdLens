@@ -59,6 +59,7 @@ private:
 
 protected:
     void worker() override;
+    void virtual initHardware();
 };
 
 
