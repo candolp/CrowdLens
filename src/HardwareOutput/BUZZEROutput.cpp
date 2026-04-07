@@ -52,7 +52,7 @@ BUZZEROutput::BUZZEROutput(const ConfigLoader& config, int pinNO, const TrafficS
 void BUZZEROutput::loadConfig(const ConfigLoader& config)
 {
     // Load configuration values
-    GPIOPin = std::stoi(config.getValue("Hardware_output:BUZZER:pin_number", "17"));
+    GPIOPin = std::stoi(config.getValue("Hardware_output:BUZZER:pin_number", "27"));
     CHIPNo = std::stoi(config.getValue("infrared_input:chip_number", "0"));
     available = true;
 }

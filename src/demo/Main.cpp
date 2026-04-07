@@ -35,15 +35,15 @@ int main() {
 #endif
 
     std::cout << "CrowdLense is Running ..." << std::endl;
-    // LEDOutput greenLED  = LEDOutput(5, 0, TrafficState::NO_TRAFFIC);
+    LEDOutput greenLED  = LEDOutput(5, 0, TrafficState::NO_TRAFFIC);
     LEDOutput redLED  = LEDOutput(17, 0,TrafficState::STAMPEDE);
     LEDOutput yellowLED  = LEDOutput(27, 0,TrafficState::CROWDED);
     // BUZZEROutput trafficBuzzer = BUZZEROutput(config, 18, TrafficState::CROWDED);
     // trafficBuzzer.setBuzzerFrequency(60000);
     // trafficBuzzer.setBuzzerBeatsPerCycle(2);
-    // BUZZEROutput stampedeBuzzer = BUZZEROutput(config, 18, TrafficState::STAMPEDE);
-    // stampedeBuzzer.setBuzzerFrequency(2000);
-    // stampedeBuzzer.setBuzzerBeatsPerCycle(5);
+    BUZZEROutput stampedeBuzzer = BUZZEROutput(config, 18, TrafficState::STAMPEDE);
+    stampedeBuzzer.setBuzzerFrequency(2000);
+    stampedeBuzzer.setBuzzerBeatsPerCycle(5);
     EmailNotification crowedEmailNotification =  EmailNotification( config, CROWDED);
     EmailNotification stampedeEmailNotification =  EmailNotification( config, STAMPEDE);
     // IRSensor isensor(config);
@@ -69,11 +69,11 @@ int main() {
     cl::ConsoleEventHandler console;
     analyser.registerAlertRunnable(console);
 
-    // analyser.registerEventRunnable(greenLED);
+    analyser.registerEventRunnable(greenLED);
     analyser.registerEventRunnable(redLED);
     analyser.registerEventRunnable(yellowLED);
     // analyser.registerEventRunnable(trafficBuzzer);
-    // analyser.registerEventRunnable(stampedeBuzzer);
+    analyser.registerEventRunnable(stampedeBuzzer);
     analyser.registerEventRunnable(crowedEmailNotification);
     analyser.registerEventRunnable(stampedeEmailNotification);
 
@@ -102,7 +102,7 @@ int main() {
     });
 
     overlay.start();
-    // greenLED.run(TrafficState::NO_TRAFFIC);
+    greenLED.run(TrafficState::NO_TRAFFIC);
     analyser.run(TrafficState::NO_TRAFFIC);
     source->start();
 

@@ -13,6 +13,7 @@
 void GPIODigitalOutput::initHardware()
 {
     // Initialize GPIO chip and line request
+    std::cout << "GPIO number is " << CHIPNo << std::endl;
     const std::string chipPath = std::format("/dev/gpiochip{}", CHIPNo);
     const std::string consumername = std::format("gpioconsumer_{}_{}", CHIPNo, GPIOPin);
 
