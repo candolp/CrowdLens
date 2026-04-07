@@ -16,19 +16,25 @@ void GPIODigitalOutput::initHardware()
     const std::string chipPath = std::format("/dev/gpiochip{}", CHIPNo);
     const std::string consumername = std::format("gpioconsumer_{}_{}", CHIPNo, GPIOPin);
 
-    // Config the pin as output
-    gpiod::line_config line_cfg;
-    line_cfg.add_line_settings(
-        GPIOPin,
-        gpiod::line_settings()
-        .set_direction(gpiod::line::direction::OUTPUT));
+    try
+    {
+        // Config the pin as output
+        gpiod::line_config line_cfg;
+        line_cfg.add_line_settings(
+            GPIOPin,
+            gpiod::line_settings()
+            .set_direction(gpiod::line::direction::OUTPUT));
 
-    chip = std::make_shared<gpiod::chip>(chipPath);
+        chip = std::make_shared<gpiod::chip>(chipPath);
 
-    auto builder = chip->prepare_request();
-    builder.set_consumer(consumername);
-    builder.set_line_config(line_cfg);
-    request = std::make_shared<gpiod::line_request>(builder.do_request());
+        auto builder = chip->prepare_request();
+        builder.set_consumer(consumername);
+        builder.set_line_config(line_cfg);
+        request = std::make_shared<gpiod::line_request>(builder.do_request());
+    }catch (const std::exception& e)
+    {
+        std::cout << "Error: GPIO initialization failed - "<< CHIPNo << " GPIOid"<< GPIOPin << e.what() << std::endl;
+    }
 }
 
 void GPIODigitalOutput::loadConfig(const ConfigLoader& config){
