@@ -102,6 +102,7 @@ int main() {
     });
 
     overlay.start();
+    greenLED.run(TrafficState::NO_TRAFFIC);
     analyser.run(TrafficState::NO_TRAFFIC);
     source->start();
 
