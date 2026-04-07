@@ -38,9 +38,9 @@ int main() {
     LEDOutput greenLED  = LEDOutput(5, 0, TrafficState::NO_TRAFFIC);
     LEDOutput redLED  = LEDOutput(17, 0,TrafficState::STAMPEDE);
     LEDOutput yellowLED  = LEDOutput(27, 0,TrafficState::CROWDED);
-    BUZZEROutput trafficBuzzer = BUZZEROutput(config, 18, TrafficState::CROWDED);
-    trafficBuzzer.setBuzzerFrequency(60000);
-    trafficBuzzer.setBuzzerBeatsPerCycle(2);
+    // BUZZEROutput trafficBuzzer = BUZZEROutput(config, 18, TrafficState::CROWDED);
+    // trafficBuzzer.setBuzzerFrequency(60000);
+    // trafficBuzzer.setBuzzerBeatsPerCycle(2);
     BUZZEROutput stampedeBuzzer = BUZZEROutput(config, 18, TrafficState::STAMPEDE);
     stampedeBuzzer.setBuzzerFrequency(2000);
     stampedeBuzzer.setBuzzerBeatsPerCycle(5);
@@ -72,7 +72,7 @@ int main() {
     analyser.registerEventRunnable(greenLED);
     analyser.registerEventRunnable(redLED);
     analyser.registerEventRunnable(yellowLED);
-    analyser.registerEventRunnable(trafficBuzzer);
+    // analyser.registerEventRunnable(trafficBuzzer);
     analyser.registerEventRunnable(stampedeBuzzer);
     analyser.registerEventRunnable(crowedEmailNotification);
     analyser.registerEventRunnable(stampedeEmailNotification);
