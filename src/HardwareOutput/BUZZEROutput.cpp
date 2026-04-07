@@ -71,6 +71,9 @@ void BUZZEROutput::run(const TrafficState state)
             runState = RunState::RUNNING;
             // Initialize sensor hardware
             workerThread = std::thread(&BUZZEROutput::worker, this);
+        }else
+        {
+            std::cout << "BUZZEROutput: Already running, ignoring run request" << std::endl;
         }
     }
     else
@@ -116,15 +119,21 @@ void BUZZEROutput::setBuzzerBeatsPerCycle(int beatsPerCycle)
 inline void BUZZEROutput::stop(TrafficState traffic_state)
 {
     runState = RunState::STOPPED;
-    for (auto& r : eventHandlers)
+    try
     {
-        r->stop(traffic_state);
-    }
-    if (request != nullptr && request)
+        for (auto& r : eventHandlers)
+        {
+            r->stop(traffic_state);
+        }
+        if (request != nullptr && request)
+        {
+            request->set_value(GPIOPin, gpiod::line::value::INACTIVE);
+        }
+        if (workerThread.joinable()) workerThread.join();
+    }catch (const std::exception& e)
     {
-        request->set_value(GPIOPin, gpiod::line::value::INACTIVE);
+        std::cout << "Error:BUZZER output " << e.what() << std::endl;
     }
-    if (workerThread.joinable()) workerThread.join();
 }
 
 void BUZZEROutput::initHardware()

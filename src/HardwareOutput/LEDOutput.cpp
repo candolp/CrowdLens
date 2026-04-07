@@ -75,6 +75,9 @@ void LEDOutput::run(const TrafficState state)
             // Initialize sensor hardware
 
             workerThread = std::thread(&LEDOutput::worker, this);
+        }else
+        {
+            std::cout << "LEDOutput: Already running, ignoring run request" << std::endl;
         }
     }else
     {
@@ -104,15 +107,21 @@ void LEDOutput::worker()
 
 void LEDOutput::stop(TrafficState traffic_state) {
     runState = RunState::STOPPED;
-    for(auto & r : eventHandlers)
+    try
     {
-        r->stop(traffic_state);
-    }
-    if (request != nullptr && request)
+        for(auto & r : eventHandlers)
+        {
+            r->stop(traffic_state);
+        }
+        if (request != nullptr && request)
+        {
+            request->set_value(GPIOPin, gpiod::line::value::INACTIVE);
+        }
+        if (workerThread.joinable()) workerThread.join();
+    }catch (const std::exception& e)
     {
-        request->set_value(GPIOPin, gpiod::line::value::INACTIVE);
+        std::cout << "Error:LED output " << e.what() << std::endl;
     }
-    if (workerThread.joinable()) workerThread.join();
 }
 
 void LEDOutput::initHardware()
