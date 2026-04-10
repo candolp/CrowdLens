@@ -41,17 +41,6 @@ public:
 
     void stop(TrafficState traffic_state) override;
 
-private:
-    int GPIOPin = 17;
-    int CHIPNo = 0;
-    bool available = false;
-    //the state for which  the LED will be turn on.
-    //this  enables the system to use different LED for different indication
-    TrafficState _indicationState = TrafficState::TRAFFIC;
-    // GPIO persistence
-    std::shared_ptr<gpiod::chip> chip;
-    std::shared_ptr<gpiod::line_request> request;
-
 protected:
     void worker() override;
 

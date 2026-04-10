@@ -28,18 +28,15 @@ public:
 
 
 
-private:
+protected:
     int GPIOPin = 17;
     int CHIPNo = 0;
     bool available = false;
-    //the state for which  the GPIODigital will be turn on.
-    //this  enables the system to use different GPIODigital for different indication
+    // the state for which this output will be activated
     TrafficState _indicationState = TrafficState::TRAFFIC;
     // GPIO persistence
     std::shared_ptr<gpiod::chip> chip;
     std::shared_ptr<gpiod::line_request> request;
-
-protected:
 
     virtual void initHardware();
 };

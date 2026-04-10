@@ -45,17 +45,8 @@ public:
     void setBuzzerBeatsPerCycle(int beatsPerCycle);
 
 private:
-    int GPIOPin = 17;
-    int CHIPNo = 0;
-    bool available = true;
     int buzzerFrequency = 2000;
     int buzzerBeatsPerCycle = 4;
-    //the state for which  the BUZZER will be turn on.
-    //this  enables the system to use different BUZZER for different indication
-    TrafficState _indicationState = TrafficState::TRAFFIC;
-    // GPIO persistence
-    std::shared_ptr<gpiod::chip> chip;
-    std::shared_ptr<gpiod::line_request> request;
 
 protected:
     void worker() override;
