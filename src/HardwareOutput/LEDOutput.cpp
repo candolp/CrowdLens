@@ -68,6 +68,7 @@ void LEDOutput::run(const TrafficState state)
     //only handle the event if the propagated state matches the expected state for action
     if (_indicationState == state)
     {
+        if (workerThread.joinable()) return;
         traffic_state = state;
         runState = RunState::RUNNING;
         // Initialize sensor hardware

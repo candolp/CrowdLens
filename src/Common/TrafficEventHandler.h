@@ -22,6 +22,7 @@ public:
 
 	void run(TrafficState state) override
 	{
+		if (workerThread.joinable()) return;
 		traffic_state = state;
 		runState = RunState::RUNNING;
 		// Starting thread
