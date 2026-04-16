@@ -69,6 +69,7 @@ void LEDOutput::run(const TrafficState state)
     if (_indicationState == state)
     {
         traffic_state = state;
+        if (workerThread.joinable()) return;
         if (runState != RunState::RUNNING)
         {
             runState = RunState::RUNNING;
@@ -118,6 +119,7 @@ void LEDOutput::stop(TrafficState traffic_state) {
             request->set_value(GPIOPin, gpiod::line::value::INACTIVE);
         }
         if (workerThread.joinable()) workerThread.join();
+        std::cout << "LEDOutput: Stopped" << std::endl;
     }catch (const std::exception& e)
     {
         std::cout << "Error:LED output " << e.what() << std::endl;
