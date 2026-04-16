@@ -4,6 +4,7 @@
 #include "../Common/ConfigLoader.h"
 #include "../Common/AlertRunnable.h"
 #include "IFrameProcessor.h"
+#include "StampedePredictor.h"
 #include "ZoneManager.h"
 #include "../Common/TrafficEventHandler.h"
 
@@ -53,6 +54,17 @@ public:
     // low-flow cutoff used alongside chokepointThreshold to detect chokepoints
     void setFlowMagnitudeThreshold(float threshold);
 
+    // how far ahead (in seconds) to project density/flow trends
+    void setPredictionHorizon(float seconds);
+    // density level at which a stampede is considered likely
+    void setStampedeDensityThreshold(float t);
+    // number of historical samples the predictor keeps per zone
+    void setPredictionWindowSize(size_t n);
+    // minimum density-per-second rate before a trend is considered real
+    void setMinTrendSlope(float slope);
+    // number of frames to skip alert evaluation while the bg model stabilises
+    void setWarmupFrames(int frames);
+
 private:
     // waits for frames and processes them; implements TrafficEventHandler::worker()
     void worker() override;
@@ -72,6 +84,10 @@ private:
     float densityThreshold_ = 0.7f; // 70% zone occupancy -> CONGESTION
     float chokepointThreshold_ = 0.85f; // 85% occupancy + low flow -> CHOKEPOINT
     float flowMagnitudeThreshold_ = 2.0f; // low-flow cutoff for chokepoint
+    int warmupFrames_ = 30; // frames to process before alerts are enabled
+    int frameCount_ = 0; // incremented each worker cycle, resets on run()
+
+    StampedePredictor predictor_;
 };
 
 }

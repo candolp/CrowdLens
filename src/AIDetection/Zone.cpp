@@ -18,4 +18,25 @@ bool Zone::contains(cv::Point point) const {
     if (polygon_.empty()) return false;
     return cv::pointPolygonTest(polygon_, cv::Point2f(point), false) >= 0;
 }
+
+std::optional<float> Zone::densityThreshold() const { return densityThreshold_; }
+std::optional<float> Zone::chokepointThreshold() const { return chokepointThreshold_; }
+std::optional<float> Zone::flowMagnitudeThreshold() const { return flowMagnitudeThreshold_; }
+std::optional<int> Zone::pixelsPerPerson() const { return pixelsPerPerson_; }
+
+void Zone::setDensityThreshold(float v) {
+    if (v >= 0.0f && v <= 1.0f) densityThreshold_ = v;
+}
+
+void Zone::setChokepointThreshold(float v) {
+    if (v >= 0.0f && v <= 1.0f) chokepointThreshold_ = v;
+}
+
+void Zone::setFlowMagnitudeThreshold(float v) {
+    if (v >= 0.0f) flowMagnitudeThreshold_ = v;
+}
+
+void Zone::setPixelsPerPerson(int v) {
+    if (v > 0) pixelsPerPerson_ = v;
+}
 }
