@@ -41,7 +41,7 @@ private:
 
 protected:
 
-    virtual void initHardware();
+    // virtual void initHardware();
 };
 
 

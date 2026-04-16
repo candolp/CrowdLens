@@ -39,7 +39,7 @@ LEDOutput::LEDOutput(int pinNO, int chipNO, const TrafficState& indicationState)
     GPIOPin = pinNO;
     CHIPNo = chipNO;
     available = true;
-    GPIODigitalOutput::initHardware();
+    LEDOutput::initHardware();
     _indicationState = indicationState;
 }
 
@@ -47,7 +47,7 @@ LEDOutput::LEDOutput(const ConfigLoader& config, int pinNO, const TrafficState& 
 {
     LEDOutput::loadConfig(config);
     GPIOPin = pinNO;
-    GPIODigitalOutput::initHardware();
+    LEDOutput::initHardware();
     _indicationState = indicationState;
 }
 
@@ -69,9 +69,16 @@ void LEDOutput::run(const TrafficState state)
     if (_indicationState == state)
     {
         traffic_state = state;
-        runState = RunState::RUNNING;
-        // Initialize sensor hardware
-        workerThread = std::thread(&LEDOutput::worker, this);
+        if (runState != RunState::RUNNING)
+        {
+            runState = RunState::RUNNING;
+            // Initialize sensor hardware
+
+            workerThread = std::thread(&LEDOutput::worker, this);
+        }else
+        {
+            std::cout << "LEDOutput: Already running, ignoring run request" << std::endl;
+        }
     }else
     {
         //stopping the LED because the dependant traffic state has changed for the current LED indication
@@ -100,15 +107,48 @@ void LEDOutput::worker()
 
 void LEDOutput::stop(TrafficState traffic_state) {
     runState = RunState::STOPPED;
-    for(auto & r : eventHandlers)
+    try
     {
-        r->stop(traffic_state);
-    }
-    if (request != nullptr && request)
+        for(auto & r : eventHandlers)
+        {
+            r->stop(traffic_state);
+        }
+        if (request != nullptr && request)
+        {
+            request->set_value(GPIOPin, gpiod::line::value::INACTIVE);
+        }
+        if (workerThread.joinable()) workerThread.join();
+    }catch (const std::exception& e)
     {
-        request->set_value(GPIOPin, gpiod::line::value::INACTIVE);
+        std::cout << "Error:LED output " << e.what() << std::endl;
     }
-    if (workerThread.joinable()) workerThread.join();
 }
 
+void LEDOutput::initHardware()
+{
+    // Initialize GPIO chip and line request
+    std::cout << "GPIO number is " << GPIOPin << std::endl;
+    const std::string chipPath = std::format("/dev/gpiochip{}", CHIPNo);
+    const std::string consumername = std::format("gpioconsumer_{}_{}", CHIPNo, GPIOPin);
+
+    try
+    {
+        // Config the pin as output
+        gpiod::line_config line_cfg;
+        line_cfg.add_line_settings(
+            GPIOPin,
+            gpiod::line_settings()
+            .set_direction(gpiod::line::direction::OUTPUT));
+
+        chip = std::make_shared<gpiod::chip>(chipPath);
+
+        auto builder = chip->prepare_request();
+        builder.set_consumer(consumername);
+        builder.set_line_config(line_cfg);
+        request = std::make_shared<gpiod::line_request>(builder.do_request());
+    }catch (const std::exception& e)
+    {
+        std::cout << "Error: GPIO initialization failed - "<< CHIPNo << " GPIOid"<< GPIOPin << e.what() << std::endl;
+    }
+}
 

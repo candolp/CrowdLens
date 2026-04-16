@@ -22,6 +22,7 @@
 #include "../Common/CrowdLensState.h"
 #include "../Notification/ConsoleEventHandler.h"
 #include "../Display/FrameOverlay.h"
+#include "../Notification/EmailNotification.h"
 #include <iostream>
 #include <memory>
 #include <opencv2/core.hpp>
@@ -34,27 +35,30 @@ int main() {
 #endif
 
     std::cout << "CrowdLense is Running ..." << std::endl;
-    LEDOutput greenLED  = LEDOutput(22, 0, TrafficState::TRAFFIC);
-    LEDOutput redLED  = LEDOutput(10, 0,TrafficState::STAMPEDE);
-    BUZZEROutput trafficBuzzer = BUZZEROutput(config, 18, TrafficState::TRAFFIC);
-    trafficBuzzer.setBuzzerFrequency(1500);
-    trafficBuzzer.setBuzzerBeatsPerCycle(2);
+    LEDOutput greenLED  = LEDOutput(5, 0, TrafficState::NO_TRAFFIC);
+    LEDOutput redLED  = LEDOutput(17, 0,TrafficState::STAMPEDE);
+    LEDOutput yellowLED  = LEDOutput(27, 0,TrafficState::CROWDED);
+    // BUZZEROutput trafficBuzzer = BUZZEROutput(config, 18, TrafficState::CROWDED);
+    // trafficBuzzer.setBuzzerFrequency(60000);
+    // trafficBuzzer.setBuzzerBeatsPerCycle(2);
     BUZZEROutput stampedeBuzzer = BUZZEROutput(config, 18, TrafficState::STAMPEDE);
-    stampedeBuzzer.setBuzzerFrequency(1500);
+    stampedeBuzzer.setBuzzerFrequency(2000);
     stampedeBuzzer.setBuzzerBeatsPerCycle(5);
-    IRSensor isensor(config);
+    EmailNotification crowedEmailNotification =  EmailNotification( config, CROWDED);
+    EmailNotification stampedeEmailNotification =  EmailNotification( config, STAMPEDE);
+    // IRSensor isensor(config);
     // isensor.registerEventRunnable(greenLED);
     // isensor.registerEventRunnable(redLED);
-    isensor.registerEventRunnable(trafficBuzzer);
+    // isensor.registerEventRunnable(trafficBuzzer);
     // isensor.run(TrafficState::NO_TRAFFIC);
-    redLED.run(TrafficState::STAMPEDE);
-    greenLED.run(TrafficState::TRAFFIC);
-    std::this_thread::sleep_for(std::chrono::milliseconds(6000));
-    printf("Press enter\n");
-    getchar();
-    greenLED.stop(TrafficState::NO_TRAFFIC);
-    redLED.stop(TrafficState::NO_TRAFFIC);
-    isensor.stop(TrafficState::NO_TRAFFIC);
+    // redLED.run(TrafficState::STAMPEDE);
+    // greenLED.run(TrafficState::TRAFFIC);
+    // std::this_thread::sleep_for(std::chrono::milliseconds(6000));
+    // printf("Press enter\n");
+    // getchar();
+    // greenLED.stop(TrafficState::NO_TRAFFIC);
+    // redLED.stop(TrafficState::NO_TRAFFIC);
+    // isensor.stop(TrafficState::NO_TRAFFIC);
 
 
     cl::ZoneManager zoneManager(config);
@@ -64,6 +68,14 @@ int main() {
     // register alert subscribers
     cl::ConsoleEventHandler console;
     analyser.registerAlertRunnable(console);
+
+    analyser.registerEventRunnable(greenLED);
+    analyser.registerEventRunnable(redLED);
+    analyser.registerEventRunnable(yellowLED);
+    // analyser.registerEventRunnable(trafficBuzzer);
+    analyser.registerEventRunnable(stampedeBuzzer);
+    analyser.registerEventRunnable(crowedEmailNotification);
+    analyser.registerEventRunnable(stampedeEmailNotification);
 
     cl::FrameOverlay overlay("CrowdLens");
     analyser.registerAlertRunnable(overlay);
@@ -90,6 +102,7 @@ int main() {
     });
 
     overlay.start();
+    greenLED.run(TrafficState::NO_TRAFFIC);
     analyser.run(TrafficState::NO_TRAFFIC);
     source->start();
 
