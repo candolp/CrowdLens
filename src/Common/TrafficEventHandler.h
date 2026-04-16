@@ -1,5 +1,7 @@
 #ifndef __CPP_TIMER_CALLBACK
 #define __CPP_TIMER_CALLBACK
+#include <atomic>
+#include <mutex>
 #include <thread>
 
 #include <vector>
@@ -22,6 +24,7 @@ public:
 
 	void run(TrafficState state) override
 	{
+		std::lock_guard<std::mutex> lk(stopMtx_);
 		if (workerThread.joinable()) return;
 		traffic_state = state;
 		runState = RunState::RUNNING;
@@ -49,6 +52,7 @@ public:
 			r->stop(traffic_state);
 		}
 
+		std::lock_guard<std::mutex> lk(stopMtx_);
 		if (workerThread.joinable()) workerThread.join();
 	}
 
@@ -84,8 +88,9 @@ protected:
 	}
 
 	std::thread workerThread;
+	std::mutex stopMtx_;
 
-	RunState runState = RunState::STOPPED;
+	std::atomic<RunState> runState{RunState::STOPPED};
 
     // vector of all the subscribers
     std::vector<Runnable*> eventHandlers;
