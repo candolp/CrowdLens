@@ -31,6 +31,8 @@ public:
    * Updates sensor parameters such as GPIO pin, sensor type, thresholds, and intervals.
    * @param config Configuration loader containing sensor settings to be applied
    */
+    ~LEDOutput();
+
     void loadConfig(const ConfigLoader& config) override;
 
     /**

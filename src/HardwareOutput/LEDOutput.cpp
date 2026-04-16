@@ -68,6 +68,7 @@ void LEDOutput::run(const TrafficState state)
     //only handle the event if the propagated state matches the expected state for action
     if (_indicationState == state)
     {
+        std::lock_guard<std::mutex> lk(stopMtx_);
         if (workerThread.joinable()) return;
         traffic_state = state;
         runState = RunState::RUNNING;
@@ -99,17 +100,29 @@ void LEDOutput::worker()
 }
 
 
+LEDOutput::~LEDOutput()
+{
+    // join the worker before request/chip are released by GPIODigitalOutput's destructor
+    runState = RunState::STOPPED;
+    std::lock_guard<std::mutex> lk(stopMtx_);
+    if (workerThread.joinable()) workerThread.join();
+}
+
 void LEDOutput::stop(TrafficState traffic_state) {
     runState = RunState::STOPPED;
     for(auto & r : eventHandlers)
     {
         r->stop(traffic_state);
     }
-    if (request != nullptr && request)
+    {
+        std::lock_guard<std::mutex> lk(stopMtx_);
+        if (workerThread.joinable()) workerThread.join();
+    }
+    // set GPIO inactive after the worker has exited so there's no concurrent set_value
+    if (request != nullptr)
     {
         request->set_value(GPIOPin, gpiod::line::value::INACTIVE);
     }
-    if (workerThread.joinable()) workerThread.join();
 }
 
 
