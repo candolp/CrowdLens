@@ -22,3 +22,8 @@ add_executable(LEDOutputTest
 )
 target_link_libraries(LEDOutputTest Common gpiodcxx)
 add_test(NAME TestLEDOutput COMMAND LEDOutputTest)
+
+add_executable(LEDIntegrationTest LEDIntegrationTest.cpp)
+target_link_libraries(LEDIntegrationTest PRIVATE HardwareOutput Common GTest::gtest_main)
+include(GoogleTest)
+gtest_discover_tests(LEDIntegrationTest)
