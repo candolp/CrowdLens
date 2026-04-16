@@ -42,8 +42,8 @@ See [docs/hardware-setup.md](docs/hardware-setup.md) for the full pin assignment
 - CMake 3.16 or newer
 - GCC 12+ or Clang 15+ (C++20 required)
 - OpenCV 4.x
-- - Curl 7.78.0+
-- - Camera module driver (libcamera)
+- Curl 7.78.0+
+- Camera module driver (libcamera)
 
 On Debian/Ubuntu (including Raspberry Pi OS):
 
@@ -152,10 +152,12 @@ MIT — see [LICENSE](LICENSE).
 
 University of Glasgow — ENG 5220 Real-Time Embedded Programming, 2025/26
 
--Members:
+### Members:
 - [Candolp Dompreh](https://github.com/candolp)
 - [Bassam ZaidAlKilani](https://github.com/3097968z)
 - [Amantle Bogacu](https://github.com/4TSHADI)
 - [Michelle Ambunya](https://github.com/WereAM)
 - [Abhishek kumar gautam](https://github.com/abhikk8171)
 
+### Project Management:
+[Project Board](https://github.com/users/candolp/projects/5)
