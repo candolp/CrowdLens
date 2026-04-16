@@ -26,10 +26,10 @@ LEDOutput::LEDOutput(const ConfigLoader& config, const TrafficState& indicationS
 LEDOutput::LEDOutput(const ConfigLoader& config, bool skipInit, const TrafficState& indicationState)
 {
     LEDOutput::loadConfig(config);
+    _indicationState = indicationState;
     if (!skipInit)
     {
         LEDOutput::initHardware();
-        _indicationState = indicationState;
     }
 
 }
