@@ -120,7 +120,7 @@ void CrowdAnalyser::worker() {
                         "Congestion detected"
                     };
                     alertCallback(ev);
-                    eventCallback(TrafficState::CROWDED);
+                    CrowdAnalyser::eventCallback(TrafficState::CROWDED);
                 }
                 if (m.density >= chokepointThreshold_ && m.flowMagnitude < flowMagnitudeThreshold_) {
                     AlertEvent ev{
@@ -131,7 +131,7 @@ void CrowdAnalyser::worker() {
                         "Chokepoint detected"
                     };
                     alertCallback(ev);
-                    eventCallback(TrafficState::STAMPEDE);
+                    CrowdAnalyser::eventCallback(TrafficState::STAMPEDE);
                 }
 
                 // run predictor and fire early-warning alerts if trends indicate we're heading toward critical levels
@@ -157,6 +157,14 @@ void CrowdAnalyser::worker() {
         // send the frame + metrics + zones to the display thread if one is registered
         if (displayCallback_)
             displayCallback_(frame, metrics, zones);
+    }
+}
+
+
+
+    void CrowdAnalyser::eventCallback(TrafficState trafficState) {
+    for(auto & r : eventHandlers) {
+        r->run(trafficState);
     }
 }
 

@@ -88,6 +88,10 @@ private:
     int frameCount_ = 0; // incremented each worker cycle, resets on run()
 
     StampedePredictor predictor_;
+
+private:
+    void eventCallback(TrafficState trafficState) override;
+
 };
 
 }

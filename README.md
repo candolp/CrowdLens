@@ -42,14 +42,15 @@ See [docs/hardware-setup.md](docs/hardware-setup.md) for the full pin assignment
 - CMake 3.16 or newer
 - GCC 12+ or Clang 15+ (C++20 required)
 - OpenCV 4.x
+- - Curl 7.78.0+
+- - Camera module driver (libcamera)
 
 On Debian/Ubuntu (including Raspberry Pi OS):
 
 ```bash
 sudo apt update
-sudo apt install cmake build-essential libopencv-dev git
+sudo apt install cmake build-essential libopencv-dev libcurl4-openssl-dev git libcamera-dev 
 ```
-
 GTest is fetched automatically at configure time — no manual install needed.
 
 ---
@@ -136,7 +137,7 @@ threading model, SOLID rationale, and latency budget.
 
 ## Social media
 
-<!-- TODO: Add social media link once account is set up -->
+https://www.instagram.com/crowdlens17
 
 ---
 
@@ -150,3 +151,11 @@ MIT — see [LICENSE](LICENSE).
 
 
 University of Glasgow — ENG 5220 Real-Time Embedded Programming, 2025/26
+
+-Members:
+- [Candolp Dompreh](https://github.com/candolp)
+- [Bassam ZaidAlKilani](https://github.com/3097968z)
+- [Amantle Bogacu](https://github.com/4TSHADI)
+- [Michelle Ambunya](https://github.com/WereAM)
+- [Abhishek kumar gautam](https://github.com/abhikk8171)
+

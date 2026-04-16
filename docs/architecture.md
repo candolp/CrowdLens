@@ -336,3 +336,6 @@ ctest --test-dir build --output-on-failure
 
 GitHub Actions (`.github/workflows/workflow.yml`) runs configure → build → test on every push
 to `main` / `master` / `develop*` and on pull requests targeting those branches.
+
+The workflow uses a Linux Trixie Docker image to build the project, this mimic the environment
+used by the Raspberry Pi 5.
