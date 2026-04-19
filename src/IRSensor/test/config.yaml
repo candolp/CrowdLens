@@ -1,54 +1,54 @@
-#Infrared config
-infrared_input:
-  pin_number: 18  # the GPIO pin number connected to the infrared sensor
-  chip_number: 0  # the chip number of the sensor
-  type: DIGITAL ##########################DIGITAL or ANALOG # Choose between DIGITAL or ANALOG sensor
-  open_threshold_value: 1 #the value of the sensor, below which traffic is detected. 1 for digital sensor, <Ir sensor datasheet> for analog sensor
-  read_interval: 10   # the time between sensor reading in milliseconds
-  max_blocked_time: 20  #The time in which the sensor is blocked to trigger traffic flow detection in milliseconds
-
-#hardware output config
-Hardware_output:
-  speaker:
-    available: false
-    pin_number: 23
-    direction: out
-  buzzer:
-    available: true
-    pin_number: 24
-    direction: out
-    volume: 50
-  LED:
-    warning:
-      available: true
-      pin_number: 25
-      direction: out
-    traffic:
-      available: true
-      pin_number: 26
-      direction: out
-
-#email notification config
-Notifications:
-  enabled: true
-  sender_email: candolpd@gmail.com
-  receiver_email: 3112938d@student.gla.ac.uk,candolpd@gmail.com
-  smtp_server: smtp.gmail.com
-  smtp_port: 587
-  smtp_password:
-  smtp_username: candolpd@gmail.com
-  template_file: templates/email.html
-  resent_time: 10
-
-#camera capture config
-Camera:
-  enabled: false
-  output_file: output.avi
-
-#AI model config
-AI:
-  enabled: false
-  model_file: models/model.tflite
-  model: OPENCV
-
-
+##Infrared config
+#infrared_input:
+#  pin_number: 18  # the GPIO pin number connected to the infrared sensor
+#  chip_number: 0  # the chip number of the sensor
+#  type: DIGITAL ##########################DIGITAL or ANALOG # Choose between DIGITAL or ANALOG sensor
+#  open_threshold_value: 1 #the value of the sensor, below which traffic is detected. 1 for digital sensor, <Ir sensor datasheet> for analog sensor
+#  read_interval: 10   # the time between sensor reading in milliseconds
+#  max_blocked_time: 20  #The time in which the sensor is blocked to trigger traffic flow detection in milliseconds
+#
+##hardware output config
+#Hardware_output:
+#  speaker:
+#    available: false
+#    pin_number: 23
+#    direction: out
+#  buzzer:
+#    available: true
+#    pin_number: 24
+#    direction: out
+#    volume: 50
+#  LED:
+#    warning:
+#      available: true
+#      pin_number: 25
+#      direction: out
+#    traffic:
+#      available: true
+#      pin_number: 26
+#      direction: out
+#
+##email notification config
+#Notifications:
+#  enabled: true
+#  sender_email: candolpd@gmail.com
+#  receiver_email: 3112938d@student.gla.ac.uk,candolpd@gmail.com
+#  smtp_server: smtp.gmail.com
+#  smtp_port: 587
+#  smtp_password:
+#  smtp_username: candolpd@gmail.com
+#  template_file: templates/email.html
+#  resent_time: 10
+#
+##camera capture config
+#Camera:
+#  enabled: false
+#  output_file: output.avi
+#
+##AI model config
+#AI:
+#  enabled: false
+#  model_file: models/model.tflite
+#  model: OPENCV
+#
+#

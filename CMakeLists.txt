@@ -28,7 +28,7 @@ add_subdirectory(${CMAKE_SOURCE_DIR}/src/CameraCapture)
 add_subdirectory(${CMAKE_SOURCE_DIR}/src/HardwareOutput)
 
 #add subdirectory containing code for Infer-red sensor
-add_subdirectory(${CMAKE_SOURCE_DIR}/src/IRSensor)
+#add_subdirectory(${CMAKE_SOURCE_DIR}/src/IRSensor)
 
 #add subdirectory containing sending notification to stakeholders
 add_subdirectory(${CMAKE_SOURCE_DIR}/src/Notification)

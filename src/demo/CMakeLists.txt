@@ -10,7 +10,7 @@ target_link_libraries(CrowdLens
         Common
         HardwareOutput
         pthread
-        IRSensor
+#        IRSensor
         gpiodcxx
         AIDetection
         CameraCapture
