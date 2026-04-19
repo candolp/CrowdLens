@@ -131,7 +131,17 @@ threading model, SOLID rationale, and latency budget.
 
 ## Demo
 
-<!-- TODO: Add demo video once hardware is available -->
+The demo runs on any machine using a local video file. On Raspberry Pi 5 with the camera module
+attached, set `Camera:index` to `0` in `config.yaml` to switch to live input.
+
+While running, the display window shows:
+- Per-zone density percentage and person count estimate
+- Optical flow arrows indicating crowd movement direction and speed
+- A red alert banner at the top of the frame when a threshold-crossing event fires, showing the zone name, alert type (`CONGESTION` / `CHOKEPOINT` / `STAMPEDE_RISK`), and severity
+
+Alert text is also printed to stdout by `ConsoleEventHandler`.
+
+<!-- TODO: Add demo video link once recorded on Pi 5 hardware -->
 
 ---
 

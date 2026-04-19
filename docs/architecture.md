@@ -22,7 +22,7 @@ so that crowd state assessments are never stale.
 | Notification    | Receives alert events via the `AlertRunnable` interface and handles them (console output, hardware, etc.). |
 | Config          | Reads `config.yaml` at startup; provides all runtime-tunable parameters. |
 | Display         | Owns the OpenCV window; receives frames via `DisplayCallback` and alerts via `AlertRunnable`; driven by `tick()` from the main thread. |
-| HardwareOutput  | (Future) Controls physical output devices (speaker, LED).                  |
+| HardwareOutput  | Controls physical LED output devices via GPIO using the gpiod library. Each device is a `TrafficEventHandler` subscriber that reacts to traffic state changes. (Buzzer support is in progress.) |
 | IRSensor        | (Future) Integrates IR trip-wire counts.                                   |
 | demo            | Entry point; wires all modules together and starts the pipeline.           |
 
@@ -46,8 +46,9 @@ so that crowd state assessments are never stale.
 | `OpenCVFrameProcessor`   | AIDetection     | Concrete: background subtraction + optical flow.          |
 | `CrowdAnalyser`          | AIDetection     | Orchestrator; extends `TrafficEventHandler`; bounded queue (cap 1); analysis thread. |
 | `StampedePredictor`      | AIDetection     | Tracks per-zone density/flow history; predicts stampede or chokepoint risk within a configurable horizon. Owned by `CrowdAnalyser`. |
-| `AppConfig`              | Config          | Plain struct holding all runtime-tunable parameters (thresholds, optical-flow params, source, zones). |
-| `ConfigLoader`           | Config          | Reads `config.yaml`; missing keys fall back to `AppConfig` defaults. |
+| `ConfigLoader`           | Config          | Reads `config.yaml`; passes values directly to per-component setters via `loadConfig()`. |
+| `GPIODigitalOutput`      | HardwareOutput  | Base class for GPIO output devices; wraps gpiod chip and line lifecycle. |
+| `LEDOutput`              | HardwareOutput  | Extends `GPIODigitalOutput`; drives a single LED on a configured GPIO pin; reacts to `TrafficState` via `run()`/`stop()`. |
 | `FrameOverlay`           | Display         | OpenCV window; extends `AlertRunnable` for the alert banner; driven by `tick()` on the main thread. |
 | `ConsoleEventHandler`    | Notification    | Extends `AlertRunnable`; prints alert details to stdout.  |
 
@@ -91,10 +92,16 @@ AlertRunnable::onAlert()   [one call per registered subscriber]
     FrameOverlay::onAlert() → queues alert banner text
     (future) HardwareAlertSink → GPIO
 
+TrafficEventHandler::eventCallback(TrafficState)
+    │ iterates eventRunnables_, calls run()/stop() on each
+    ▼
+Runnable::run() / stop()   [one call per registered subscriber]
+    LEDOutput → sets GPIO pin high/low via gpiod
+
 ── Main thread loop ─────────────────────────────────────────────────────────
-while (overlay.tick()) {}
-    tick() calls cv::waitKey(1) — 1 ms yield, not a busy-wait
-    returns false when the user presses 'q' or closes the window
+overlay.runUntilClosed()
+    internally calls cv::waitKey(1) — 1 ms yield, not a busy-wait
+    returns when the user presses 'q' or closes the window
 ```
 
 ---
@@ -103,7 +110,7 @@ while (overlay.tick()) {}
 
 | Thread              | Owner                | Wakes on                              | Sleeps on                          |
 |---------------------|----------------------|---------------------------------------|------------------------------------|
-| Main thread         | `main()`             | `FrameOverlay::tick()` returns        | `cv::waitKey(1)` inside `tick()`   |
+| Main thread         | `main()`             | `FrameOverlay::runUntilClosed()` returns | `cv::waitKey(1)` inside the loop |
 | Capture thread      | `CameraFrameSource`  | OS frame-ready event via `read()`     | `cv::VideoCapture::read()` blocks  |
 | Analysis thread     | `CrowdAnalyser`      | `condition_variable::notify_one()`    | `condition_variable::wait()`       |
 
@@ -310,6 +317,7 @@ The subscriber's lifetime must exceed `CrowdAnalyser`'s. `stop()` is broadcast t
 - CMake ≥ 3.16
 - C++20 compiler (GCC 12+ or Clang 15+)
 - OpenCV 4.x (`libopencv-dev` on Debian/Ubuntu, `opencv` on Homebrew)
+- libgpiod (`libgpiod-dev` on Debian/Ubuntu) — required for HardwareOutput on Raspberry Pi; not needed on macOS development machines
 - Internet access for first build (GTest fetched via FetchContent)
 
 ### Build
@@ -331,6 +339,17 @@ ctest --test-dir build --output-on-failure
 ./build/src/demo/CrowdLens
 # Press 'q' in the window to stop
 ```
+
+### Test suites
+
+| Suite | Module |
+|---|---|
+| `AIDetection_test` | Zone, CrowdAnalyser |
+| `CameraCapture_test` | VideoFileFrameSource, CameraFrameSource |
+| `Notification_test` | ConsoleEventHandler |
+| `Display_test` | FrameOverlay |
+| `ConfigLoaderTest` | ConfigLoader |
+| `HardwareOutput_test` | LEDOutput |
 
 ### CI
 
