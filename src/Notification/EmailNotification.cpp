@@ -100,6 +100,7 @@ void EmailNotification::run(TrafficState state)
     // Only handle the event if the propagated state matches the expected state for action
     if (_indicationState == state)
     {
+        std::cout << "[EmailNotification] Starting notification for state: " << state << std::endl;
         traffic_state = state;
         runState      = RunState::RUNNING;
         workerThread  = std::thread(&EmailNotification::worker, this);
@@ -151,11 +152,13 @@ void EmailNotification::worker()
                 "Regards,\r\nCrowdLens";
 
             sendAlert(subject, body);
+
         }
+        std::cout << "[EmailNotification] Stampede alert sent" << std::endl;
     }
     catch (const std::exception& e)
     {
-        std::cerr << "[EmailNotification] worker exception: " << e.what() << "\n";
+        std::cerr << "[EmailNotification] worker exception: " << e.what() << "\n"<< std::endl;
     }
 
     runState = RunState::STOPPED;
@@ -168,14 +171,15 @@ void EmailNotification::worker()
 void EmailNotification::stop(TrafficState ts)
 {
     runState = RunState::STOPPED;
-
-    for (auto& r : eventHandlers)
-    {
-        r->stop(ts);
-    }
+    //
+    // for (auto& r : eventHandlers)
+    // {
+    //     r->stop(ts);
+    // }
 
     if (workerThread.joinable())
         workerThread.join();
+    std::cout << "[EmailNotification] stopped" << std::endl;
 }
 
 // ---------------------------------------------------------------------------
@@ -187,13 +191,14 @@ bool EmailNotification::sendAlert(const std::string& subject, const std::string&
     const auto recipients = splitCSV(config_.toAddr);
     if (recipients.empty())
     {
-        std::cerr << "[EmailNotification] No recipients configured.\n";
+        std::cerr << "[EmailNotification] No recipients configured.\n"<< std::endl;
         return false;
     }
 
     bool allOk = true;
     for (const auto& recipient : recipients)
     {
+        std::cout << "[EmailNotification] Sending alert to " << recipient << std::endl;
         if (!sendToOne(recipient, subject, body))
             allOk = false;
     }
@@ -211,7 +216,7 @@ bool EmailNotification::sendToOne(const std::string& recipient,
     CURL* curl = curl_easy_init();
     if (!curl)
     {
-        std::cerr << "[EmailNotification] Failed to initialise curl handle\n";
+        std::cerr << "[EmailNotification] Failed to initialise curl handle\n"<< std::endl;
         return false;
     }
 
@@ -241,7 +246,7 @@ bool EmailNotification::sendToOne(const std::string& recipient,
     rcptList = curl_slist_append(rcptList, mailTo.c_str());
     if (!rcptList)
     {
-        std::cerr << "[EmailNotification] Failed to build recipient list\n";
+        std::cerr << "[EmailNotification] Failed to build recipient list\n"<< std::endl;
         curl_easy_cleanup(curl);
         return false;
     }
@@ -254,9 +259,9 @@ bool EmailNotification::sendToOne(const std::string& recipient,
 
     if (res != CURLE_OK)
         std::cerr << "[EmailNotification] Send to <" << recipient
-                  << "> failed: " << curl_easy_strerror(res) << "\n";
+                  << "> failed: " << curl_easy_strerror(res) << "\n"<< std::endl;
     else
-        std::cout << "[EmailNotification] Alert sent to <" << recipient << ">.\n";
+        std::cout << "[EmailNotification] Alert sent to <" << recipient << ">.\n"<< std::endl;
 
     curl_slist_free_all(rcptList);
     curl_easy_cleanup(curl);

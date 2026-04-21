@@ -8,6 +8,7 @@
 namespace cl {
 
 enum class AlertType {
+    NO_ALERT, // all zones below threshold, system is idle
     // reactive: fires when the condition is already present
     CONGESTION, // density has crossed densityThreshold_
     CHOKEPOINT, // density high + flow already low

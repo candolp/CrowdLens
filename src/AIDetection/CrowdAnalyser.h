@@ -12,6 +12,7 @@
 #include <chrono>
 #include <condition_variable>
 #include <functional>
+#include <map>
 #include <memory>
 #include <mutex>
 #include <optional>
@@ -88,6 +89,10 @@ private:
     int frameCount_ = 0; // incremented each worker cycle, resets on run()
 
     StampedePredictor predictor_;
+
+    // tracks when each alert type last fired; prevents flooding subscribers every frame
+    std::map<AlertType, std::chrono::steady_clock::time_point> lastAlertTime_;
+    static constexpr std::chrono::seconds alertCooldown{2};
 
 private:
     void eventCallback(TrafficState trafficState) override;

@@ -110,46 +110,80 @@ void CrowdAnalyser::worker() {
 
         // skip alert evaluation until the bg model has had enough frames to stabilise
         if (frameCount_ > warmupFrames_) {
+            auto now = std::chrono::steady_clock::now();
+            bool anyAlert = false;
+
             for (CrowdMetrics& m : metrics) {
-                if (m.density >= densityThreshold_) {
-                    AlertEvent ev{
-                        TrafficState::CROWDED,
-                        AlertType::CONGESTION,
-                        AlertSeverity::WARNING,
-                        m,
-                        "Congestion detected"
-                    };
-                    alertCallback(ev);
-                    CrowdAnalyser::eventCallback(TrafficState::CROWDED);
+                std::optional<Zone> zone = zoneManager_.findZone(m.zoneName);
+                float densityT = zone ? zone->densityThreshold().value_or(densityThreshold_) : densityThreshold_;
+                float chokepointT = zone ? zone->chokepointThreshold().value_or(chokepointThreshold_) : chokepointThreshold_;
+                float flowT = zone ? zone->flowMagnitudeThreshold().value_or(flowMagnitudeThreshold_) : flowMagnitudeThreshold_;
+
+                if (m.density >= densityT) {
+                    anyAlert = true;
+                    if (now - lastAlertTime_[AlertType::CONGESTION] >= alertCooldown) {
+                        lastAlertTime_[AlertType::CONGESTION] = now;
+                        AlertEvent ev{
+                            TrafficState::CROWDED,
+                            AlertType::CONGESTION,
+                            AlertSeverity::WARNING,
+                            m,
+                            "Congestion detected"
+                        };
+                        alertCallback(ev);
+                        CrowdAnalyser::eventCallback(TrafficState::CROWDED);
+                    }
                 }
-                if (m.density >= chokepointThreshold_ && m.flowMagnitude < flowMagnitudeThreshold_) {
-                    AlertEvent ev{
-                        TrafficState::STAMPEDE,
-                        AlertType::CHOKEPOINT,
-                        AlertSeverity::CRITICAL,
-                        m,
-                        "Chokepoint detected"
-                    };
-                    alertCallback(ev);
-                    CrowdAnalyser::eventCallback(TrafficState::STAMPEDE);
+                if (m.density >= chokepointT && m.flowMagnitude < flowT) {
+                    anyAlert = true;
+                    if (now - lastAlertTime_[AlertType::CHOKEPOINT] >= alertCooldown) {
+                        lastAlertTime_[AlertType::CHOKEPOINT] = now;
+                        AlertEvent ev{
+                            TrafficState::STAMPEDE,
+                            AlertType::CHOKEPOINT,
+                            AlertSeverity::CRITICAL,
+                            m,
+                            "Chokepoint detected"
+                        };
+                        alertCallback(ev);
+                        CrowdAnalyser::eventCallback(TrafficState::STAMPEDE);
+                    }
                 }
 
                 // run predictor and fire early-warning alerts if trends indicate we're heading toward critical levels
                 predictor_.update(m);
                 StampedePredictor::Prediction pred = predictor_.predict(m.zoneName);
                 if (pred.stampedeRisk) {
-                    std::string msg = "Stampede risk: density rising fast, ~"
-                        + std::to_string(static_cast<int>(pred.timeToStampede))
-                        + "s to critical level";
-                    AlertEvent ev{ TrafficState::STAMPEDE, AlertType::STAMPEDE_RISK, AlertSeverity::WARNING, m, msg };
-                    alertCallback(ev);
+                    anyAlert = true;
+                    if (now - lastAlertTime_[AlertType::STAMPEDE_RISK] >= alertCooldown) {
+                        lastAlertTime_[AlertType::STAMPEDE_RISK] = now;
+                        std::string msg = "Stampede risk: density rising fast, ~"
+                            + std::to_string(static_cast<int>(pred.timeToStampede))
+                            + "s to critical level";
+                        AlertEvent ev{ TrafficState::STAMPEDE, AlertType::STAMPEDE_RISK, AlertSeverity::WARNING, m, msg };
+                        alertCallback(ev);
+                    }
                 }
                 if (pred.chokepointRisk) {
-                    std::string msg = "Chokepoint predicted: density rising, flow falling, ~"
-                        + std::to_string(static_cast<int>(pred.timeToChokepoint))
-                        + "s to chokepoint";
-                    AlertEvent ev{ TrafficState::CROWDED, AlertType::CHOKEPOINT_PREDICTED, AlertSeverity::WARNING, m, msg };
+                    anyAlert = true;
+                    if (now - lastAlertTime_[AlertType::CHOKEPOINT_PREDICTED] >= alertCooldown) {
+                        lastAlertTime_[AlertType::CHOKEPOINT_PREDICTED] = now;
+                        std::string msg = "Chokepoint predicted: density rising, flow falling, ~"
+                            + std::to_string(static_cast<int>(pred.timeToChokepoint))
+                            + "s to chokepoint";
+                        AlertEvent ev{ TrafficState::CROWDED, AlertType::CHOKEPOINT_PREDICTED, AlertSeverity::WARNING, m, msg };
+                        alertCallback(ev);
+                    }
+                }
+            }
+
+            // nothing triggered, return to default state
+            if (!anyAlert) {
+                if (now - lastAlertTime_[AlertType::NO_ALERT] >= alertCooldown) {
+                    lastAlertTime_[AlertType::NO_ALERT] = now;
+                    AlertEvent ev{ TrafficState::NO_TRAFFIC, AlertType::NO_ALERT, AlertSeverity::INFO, {}, "Normal" };
                     alertCallback(ev);
+                    CrowdAnalyser::eventCallback(TrafficState::NO_TRAFFIC);
                 }
             }
         }

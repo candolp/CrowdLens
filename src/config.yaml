@@ -32,7 +32,7 @@ Notifications:
   receiver_email: 3112938d@student.gla.ac.uk, candolpd@gmail.com, 3164666B@student.gla.ac.uk
   smtp_server: smtp.gmail.com
   smtp_port: 587
-  smtp_password: 
+  smtp_password: password
   smtp_username: crowdlens17@gmail.com
   template_file: templates/email.html
   resent_time: 10
@@ -41,7 +41,7 @@ Notifications:
 Camera:
   enabled: false
   output_file: output.avi
-  index: -1
+  index: 0
   video_file: videos/video2.mp4
 
 #AI model config
@@ -52,9 +52,9 @@ AI:
 
 thresholds:
   density: 0.25
-  chokepoint: 0.85
-  flow_magnitude: 2.0
-  warmup_frames: 30
+  chokepoint: 0.25   # matches density threshold for lab testing (normally 0.85)
+  flow_magnitude: 15.0  # raised for lab testing (normally 2.0)
+  warmup_frames: 10  # fewer warmup frames so alerts fire sooner
 
 frame_processor:
   pixels_per_person: 200
@@ -77,17 +77,20 @@ zones:
   names: entrance_1, exit_1, main_hall
   zone.entrance_1:
     type: ENTRANCE
-    points: 0,0 200,0 200,432 0,432
-    # pixels_per_person: 150
-    # density_threshold: 0.3
-    # chokepoint_threshold: 0.8
-    # flow_magnitude_threshold: 2.0
+    points: 190,109 190,185 296,185, 296,109
+    pixels_per_person: 30
+    density_threshold: 0.12
+    chokepoint_threshold: 0.2
+    flow_magnitude_threshold: 15.0  # commented out for lab testing
   zone.exit_1:
     type: EXIT
-    points: 568,0 768,0 768,432 568,432
-    # pixels_per_person: 150
+    points: 0,157 0,438 136,438 136,157
+    pixels_per_person: 80
     # density_threshold: 0.3
   zone.main_hall:
     type: GENERAL
-    points: 200,0 568,0 568,432 200,432
+    points: 156,190 156,455 424,455 424,190
+    density_threshold: 0.2
+    pixels_per_person: 70
+    # flow_magnitude_threshold: 0.5  # commented out for lab testing
     # no overrides — falls back to global thresholds

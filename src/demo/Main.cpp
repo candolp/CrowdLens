@@ -41,7 +41,7 @@ int main() {
     BUZZEROutput stampedeBuzzer = BUZZEROutput(config, 18, TrafficState::STAMPEDE);
     stampedeBuzzer.setBuzzerFrequency(2000);
     stampedeBuzzer.setBuzzerBeatsPerCycle(5);
-    EmailNotification crowedEmailNotification =  EmailNotification( config, CROWDED);
+    // EmailNotification crowedEmailNotification =  EmailNotification( config, CROWDED);
     EmailNotification stampedeEmailNotification =  EmailNotification( config, STAMPEDE);
 
     cl::ZoneManager zoneManager(config);
@@ -57,7 +57,7 @@ int main() {
     analyser.registerEventRunnable(yellowLED);
     // analyser.registerEventRunnable(trafficBuzzer);
     analyser.registerEventRunnable(stampedeBuzzer);
-    analyser.registerEventRunnable(crowedEmailNotification);
+    // analyser.registerEventRunnable(crowedEmailNotification);
     analyser.registerEventRunnable(stampedeEmailNotification);
 
     cl::FrameOverlay overlay("CrowdLens");
