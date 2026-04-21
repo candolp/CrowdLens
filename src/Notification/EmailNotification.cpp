@@ -100,6 +100,7 @@ void EmailNotification::run(TrafficState state)
     // Only handle the event if the propagated state matches the expected state for action
     if (_indicationState == state)
     {
+        std::cout << "[EmailNotification] Starting notification for state: " << state << std::endl;
         traffic_state = state;
         runState      = RunState::RUNNING;
         workerThread  = std::thread(&EmailNotification::worker, this);
@@ -151,7 +152,9 @@ void EmailNotification::worker()
                 "Regards,\r\nCrowdLens";
 
             sendAlert(subject, body);
+
         }
+        std::cout << "[EmailNotification] Stampede alert sent" << std::endl;
     }
     catch (const std::exception& e)
     {
@@ -195,6 +198,7 @@ bool EmailNotification::sendAlert(const std::string& subject, const std::string&
     bool allOk = true;
     for (const auto& recipient : recipients)
     {
+        std::cout << "[EmailNotification] Sending alert to " << recipient << std::endl;
         if (!sendToOne(recipient, subject, body))
             allOk = false;
     }
