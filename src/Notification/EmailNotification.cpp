@@ -169,11 +169,6 @@ void EmailNotification::stop(TrafficState ts)
 {
     runState = RunState::STOPPED;
 
-    for (auto& r : eventHandlers)
-    {
-        r->stop(ts);
-    }
-
     if (workerThread.joinable())
         workerThread.join();
 }

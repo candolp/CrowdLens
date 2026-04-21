@@ -41,8 +41,8 @@ int main() {
     BUZZEROutput stampedeBuzzer = BUZZEROutput(config, 18, TrafficState::STAMPEDE);
     stampedeBuzzer.setBuzzerFrequency(2000);
     stampedeBuzzer.setBuzzerBeatsPerCycle(5);
-    EmailNotification crowedEmailNotification =  EmailNotification( config, CROWDED);
-    EmailNotification stampedeEmailNotification =  EmailNotification( config, STAMPEDE);
+    // EmailNotification crowedEmailNotification =  EmailNotification( config, CROWDED);
+    // EmailNotification stampedeEmailNotification =  EmailNotification( config, STAMPEDE);
 
     cl::ZoneManager zoneManager(config);
     std::unique_ptr<cl::OpenCVFrameProcessor> processor = std::make_unique<cl::OpenCVFrameProcessor>(config);
@@ -57,8 +57,8 @@ int main() {
     analyser.registerEventRunnable(yellowLED);
     // analyser.registerEventRunnable(trafficBuzzer);
     analyser.registerEventRunnable(stampedeBuzzer);
-    analyser.registerEventRunnable(crowedEmailNotification);
-    analyser.registerEventRunnable(stampedeEmailNotification);
+    // analyser.registerEventRunnable(crowedEmailNotification);
+    // analyser.registerEventRunnable(stampedeEmailNotification);
 
     cl::FrameOverlay overlay("CrowdLens");
     analyser.registerAlertRunnable(overlay);
