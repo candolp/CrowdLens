@@ -111,9 +111,11 @@ void CrowdAnalyser::worker() {
         // skip alert evaluation until the bg model has had enough frames to stabilise
         if (frameCount_ > warmupFrames_) {
             auto now = std::chrono::steady_clock::now();
+            bool anyAlert = false;
 
             for (CrowdMetrics& m : metrics) {
                 if (m.density >= densityThreshold_) {
+                    anyAlert = true;
                     if (now - lastAlertTime_[AlertType::CONGESTION] >= alertCooldown) {
                         lastAlertTime_[AlertType::CONGESTION] = now;
                         AlertEvent ev{
@@ -128,6 +130,7 @@ void CrowdAnalyser::worker() {
                     }
                 }
                 if (m.density >= chokepointThreshold_ && m.flowMagnitude < flowMagnitudeThreshold_) {
+                    anyAlert = true;
                     if (now - lastAlertTime_[AlertType::CHOKEPOINT] >= alertCooldown) {
                         lastAlertTime_[AlertType::CHOKEPOINT] = now;
                         AlertEvent ev{
@@ -146,6 +149,7 @@ void CrowdAnalyser::worker() {
                 predictor_.update(m);
                 StampedePredictor::Prediction pred = predictor_.predict(m.zoneName);
                 if (pred.stampedeRisk) {
+                    anyAlert = true;
                     if (now - lastAlertTime_[AlertType::STAMPEDE_RISK] >= alertCooldown) {
                         lastAlertTime_[AlertType::STAMPEDE_RISK] = now;
                         std::string msg = "Stampede risk: density rising fast, ~"
@@ -156,6 +160,7 @@ void CrowdAnalyser::worker() {
                     }
                 }
                 if (pred.chokepointRisk) {
+                    anyAlert = true;
                     if (now - lastAlertTime_[AlertType::CHOKEPOINT_PREDICTED] >= alertCooldown) {
                         lastAlertTime_[AlertType::CHOKEPOINT_PREDICTED] = now;
                         std::string msg = "Chokepoint predicted: density rising, flow falling, ~"
@@ -164,6 +169,16 @@ void CrowdAnalyser::worker() {
                         AlertEvent ev{ TrafficState::CROWDED, AlertType::CHOKEPOINT_PREDICTED, AlertSeverity::WARNING, m, msg };
                         alertCallback(ev);
                     }
+                }
+            }
+
+            // nothing triggered, return to default state
+            if (!anyAlert) {
+                if (now - lastAlertTime_[AlertType::NO_ALERT] >= alertCooldown) {
+                    lastAlertTime_[AlertType::NO_ALERT] = now;
+                    AlertEvent ev{ TrafficState::NO_TRAFFIC, AlertType::NO_ALERT, AlertSeverity::INFO, {}, "Normal" };
+                    alertCallback(ev);
+                    CrowdAnalyser::eventCallback(TrafficState::NO_TRAFFIC);
                 }
             }
         }
