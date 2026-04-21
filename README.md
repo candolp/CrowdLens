@@ -137,7 +137,7 @@ While running, the display window shows:
 
 Alert text is also printed to stdout by `ConsoleEventHandler`.
 
-<!-- TODO: Add demo video link once recorded on Pi 5 hardware -->
+https://github.com/user-attachments/assets/cbd9f940-5d7e-449b-bb70-fc186c8daab7
 
 ---
 
