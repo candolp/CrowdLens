@@ -41,7 +41,7 @@ Notifications:
 Camera:
   enabled: false
   output_file: output.avi
-  index: -1
+  index: 0
   video_file: videos/video2.mp4
 
 #AI model config
