@@ -52,9 +52,9 @@ AI:
 
 thresholds:
   density: 0.25
-  chokepoint: 0.85
-  flow_magnitude: 2.0
-  warmup_frames: 30
+  chokepoint: 0.25   # matches density threshold for lab testing (normally 0.85)
+  flow_magnitude: 15.0  # raised for lab testing (normally 2.0)
+  warmup_frames: 10  # fewer warmup frames so alerts fire sooner
 
 frame_processor:
   pixels_per_person: 200
@@ -78,10 +78,10 @@ zones:
   zone.entrance_1:
     type: ENTRANCE
     points: 190,109 190,185 296,185, 296,109
-    pixels_per_person: 50
-    density_threshold: 0.1
-    # chokepoint_threshold: 0.8
-    flow_magnitude_threshold: 0.5
+    pixels_per_person: 30
+    density_threshold: 0.12
+    chokepoint_threshold: 0.2
+    flow_magnitude_threshold: 15.0  # commented out for lab testing
   zone.exit_1:
     type: EXIT
     points: 0,157 0,438 136,438 136,157
@@ -92,5 +92,5 @@ zones:
     points: 156,190 156,455 424,455 424,190
     density_threshold: 0.2
     pixels_per_person: 70
-    flow_magnitude_threshold: 0.5
+    # flow_magnitude_threshold: 0.5  # commented out for lab testing
     # no overrides — falls back to global thresholds
