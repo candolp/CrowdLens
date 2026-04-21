@@ -66,16 +66,12 @@ void BUZZEROutput::run(const TrafficState state)
     if (_indicationState == state)
     {
         traffic_state = state;
-        if (workerThread.joinable()) return;
-        if (runState != RunState::RUNNING)
-        {
-            runState = RunState::RUNNING;
-            // Initialize sensor hardware
-            workerThread = std::thread(&BUZZEROutput::worker, this);
-        }else
-        {
-            std::cout << "BUZZEROutput: Already running, ignoring run request" << std::endl;
+        if (workerThread.joinable()) {
+            if (runState == RunState::RUNNING) return;
+            workerThread.join();
         }
+        runState = RunState::RUNNING;
+        workerThread = std::thread(&BUZZEROutput::worker, this);
     }
     else
     {
