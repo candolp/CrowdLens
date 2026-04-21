@@ -5,6 +5,8 @@ set(CMAKE_CXX_STANDARD 20)
 
 enable_testing()
 
+configure_file(${CMAKE_SOURCE_DIR}/src/config.yaml ${CMAKE_BINARY_DIR}/config.yaml COPYONLY)
+add_compile_definitions(CONFIG_PATH="${CMAKE_BINARY_DIR}/config.yaml")
 
 include(FetchContent)
 FetchContent_Declare(
@@ -36,11 +38,6 @@ add_subdirectory(${CMAKE_SOURCE_DIR}/src/Notification)
 #add subdirectory containing demo code
 add_subdirectory(${CMAKE_SOURCE_DIR}/src/demo)
 
-#add config file
-configure_file(${CMAKE_SOURCE_DIR}/src/config.yaml ${CMAKE_BINARY_DIR}/config.yaml COPYONLY)
-
-# Define CONFIG_PATH for all targets
-add_compile_definitions(CONFIG_PATH="${CMAKE_BINARY_DIR}/config.yaml")
 #add subdirectory containing visual overlay / display window
 add_subdirectory(${CMAKE_SOURCE_DIR}/src/Display)
 
