@@ -78,16 +78,19 @@ zones:
   zone.entrance_1:
     type: ENTRANCE
     points: 190,109 190,185 296,185, 296,109
-    # pixels_per_person: 150
-    # density_threshold: 0.3
+    pixels_per_person: 50
+    density_threshold: 0.1
     # chokepoint_threshold: 0.8
-    # flow_magnitude_threshold: 2.0
+    flow_magnitude_threshold: 0.5
   zone.exit_1:
     type: EXIT
     points: 0,157 0,438 136,438 136,157
-    # pixels_per_person: 150
+    pixels_per_person: 80
     # density_threshold: 0.3
   zone.main_hall:
     type: GENERAL
     points: 156,190 156,455 424,455 424,190
+    density_threshold: 0.2
+    pixels_per_person: 70
+    flow_magnitude_threshold: 0.5
     # no overrides — falls back to global thresholds
