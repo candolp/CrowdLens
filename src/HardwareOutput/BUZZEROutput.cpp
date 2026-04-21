@@ -79,8 +79,9 @@ void BUZZEROutput::run(const TrafficState state)
     }
     else
     {
-        //stopping the LED because the dependant traffic state has changed for the current LED indication
-        stop(state);
+        runState = RunState::STOPPED;
+        if (request && available)
+            request->set_value(GPIOPin, gpiod::line::value::INACTIVE);
     }
 }
 
