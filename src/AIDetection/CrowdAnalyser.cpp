@@ -114,7 +114,12 @@ void CrowdAnalyser::worker() {
             bool anyAlert = false;
 
             for (CrowdMetrics& m : metrics) {
-                if (m.density >= densityThreshold_) {
+                std::optional<Zone> zone = zoneManager_.findZone(m.zoneName);
+                float densityT = zone ? zone->densityThreshold().value_or(densityThreshold_) : densityThreshold_;
+                float chokepointT = zone ? zone->chokepointThreshold().value_or(chokepointThreshold_) : chokepointThreshold_;
+                float flowT = zone ? zone->flowMagnitudeThreshold().value_or(flowMagnitudeThreshold_) : flowMagnitudeThreshold_;
+
+                if (m.density >= densityT) {
                     anyAlert = true;
                     if (now - lastAlertTime_[AlertType::CONGESTION] >= alertCooldown) {
                         lastAlertTime_[AlertType::CONGESTION] = now;
@@ -129,7 +134,7 @@ void CrowdAnalyser::worker() {
                         CrowdAnalyser::eventCallback(TrafficState::CROWDED);
                     }
                 }
-                if (m.density >= chokepointThreshold_ && m.flowMagnitude < flowMagnitudeThreshold_) {
+                if (m.density >= chokepointT && m.flowMagnitude < flowT) {
                     anyAlert = true;
                     if (now - lastAlertTime_[AlertType::CHOKEPOINT] >= alertCooldown) {
                         lastAlertTime_[AlertType::CHOKEPOINT] = now;
